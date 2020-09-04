@@ -18,10 +18,14 @@ pool.on('error', function (err) {
 const allNeutralFunction = require('./models/neutral');
 const NeutralModelsObject = allNeutralFunction( pool );
 
+const allSellerFunction = require('./models/seller')
+const SellerModelsObject = allSellerFunction(pool)
+
 module.exports = {
   queryInterface: (text, params, callback) => {
     return pool.query(text, params, callback);
   },
   pool:pool,
-  neutral: NeutralModelsObject
+  neutral: NeutralModelsObject,
+  seller: SellerModelsObject
 };

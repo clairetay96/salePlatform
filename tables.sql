@@ -30,4 +30,5 @@ CREATE TABLE IF NOT EXISTS catalogue (
 	price NUMERIC(10,2),
 	product_desc TEXT,
 	image_url TEXT,
-	seller_id INTEGER);
+	seller_id INTEGER,
+	item_name TEXT);

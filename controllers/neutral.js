@@ -1,10 +1,21 @@
+
 const sha256 = require('js-sha256')
+const SALT = "stay toasty"
+
 module.exports = (allModels) => {
 
-    const db_neutral =allModels.neutral
+    const db_neutral = allModels.neutral
 
     let renderHome = (request, response) =>{
-        response.render('homepage')
+        if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']) {
+            if(request.cookies['role']=="sellers"){
+                response.send("Seller is logged in. Create a new catalogue.")
+            } else if(request.cookies['role']=="buyers"){
+                response.send("buyer is logged in")
+            }
+        } else {
+            response.render('homepage')
+        }
     }
 
     let logIn = (request, response) =>{
@@ -19,7 +30,11 @@ module.exports = (allModels) => {
             } else if(!logInSuccess){
                 response.send("Incorrect password.")
             } else if(logInSuccess) {
-                response.send("Log in successful!")
+                let role = x.role.slice(0, x.role.length-1)
+                response.cookie('userID', res.rows[0][role+'_id'])
+                response.cookie('role', res.rows[0].role)
+                response.cookie('sessionCookie', sha256(res.rows[0][role+'_id']+SALT+res.rows[0].role))
+                response.redirect("/")
             }
 
         })
