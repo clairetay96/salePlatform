@@ -1,7 +1,7 @@
 module.exports = (dbPool) =>{
 
     let newUser = (values, callback) =>{
-        let queryText = "SELECT * FROM "+values[3]+" WHERE username=$1"
+        let queryText = "SELECT username FROM (SELECT username FROM sellers UNION ALL SELECT username FROM buyers) AS all_users WHERE username=$1"
         dbPool.query(queryText, [values[0]], (err, res)=>{
             if(res.rows.length>0){
                 callback(err, res, true)

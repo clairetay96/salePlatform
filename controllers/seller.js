@@ -9,11 +9,11 @@ module.exports = (allModels) => {
     let renderCatalogueForm = (request, response) =>{
         if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"){
             response.render('catalogueform', {seller_id: request.cookies['userID']})
-
         } else {
             response.send("You do not have permission to view this page.")
         }
     }
+
 
     let newCatalogueForm = (request, response) =>{
         let x = request.body
@@ -35,11 +35,12 @@ module.exports = (allModels) => {
                     response.send("Database update successful.")
                 }
             })
-
         } else {
             response.send("You do not have permission to add to catalogue.")
         }
     }
+
+
 
     let renderSaleForm = (request, response)=>{
         if(sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers") {
@@ -55,8 +56,8 @@ module.exports = (allModels) => {
         } else {
             response.send("you do not have permission to view this page.")
         }
-
     }
+
 
     let newSaleForm = (request, response) =>{
         let x = request.body
@@ -64,7 +65,6 @@ module.exports = (allModels) => {
         if(sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"&&request.cookies['userID']==sellerID){
             let inputRows = []
             let datesLive =[]
-
             Object.keys(x).forEach((item)=>{
                 if(item.includes("qtyAv")){
                     let itemKey = item.slice(5, item.length)
@@ -85,12 +85,54 @@ module.exports = (allModels) => {
                 } else if(success){
                     response.send("Sale added successfully.")
                 }
-
             })
-
         } else {
             response.send("You do not have permission for this.")
         }
+    }
+
+    let sellerPage = (request, response)=>{
+        let sellerName = request.params.username
+        db_seller.sellerInfo(sellerName, (err, seller_items, seller_sales)=>{
+            if(err){
+                console.log(err.message)
+                response.send("Error occured.")
+            } else {
+                response.render('sellerPage', {items: seller_items, sales: seller_sales})
+            }
+        })
+    }
+
+
+    let saleWaitingRoom = (request, response)=>{
+        let saleID = request.params.id
+        let seller_username = request.params.username
+        db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
+            if(err){
+                console.log(err.message)
+                response.send("Error occurred.")
+            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
+                response.send("This sale does not exist - did you get the username/sale ID right?")
+            }else {
+                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems})
+            }
+        })
+    }
+
+    let saleLivePage = (request, response) =>{
+        let saleID = request.params.id
+        let seller_username = request.params.username
+        db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
+            if(err){
+                console.log(err.message)
+                response.send("Error occurred.")
+            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
+                response.send("This sale does not exist - did you get the username/sale ID right?")
+            }else {
+                response.render("saleLivePage", {sale: saleInfo, items: saleItems})
+            }
+
+        })
 
     }
 
@@ -99,7 +141,10 @@ module.exports = (allModels) => {
         renderCatalogueForm,
         newCatalogueForm,
         renderSaleForm,
-        newSaleForm
+        newSaleForm,
+        sellerPage,
+        saleWaitingRoom,
+        saleLivePage
 
     }
 

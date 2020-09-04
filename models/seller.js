@@ -11,8 +11,8 @@ module.exports = (dbPool) =>{
             })
         })
         callback(null, true)
-
     }
+
 
     let getSellerItems = (seller_id, callback)=>{
         let queryText = "SELECT * FROM catalogue WHERE seller_id=$1"
@@ -20,6 +20,7 @@ module.exports = (dbPool) =>{
             callback(err, res)
         })
     }
+
 
     let makeNewSales = (seller_id, datesLive, inputRows, callback)=>{
         //check if all item ids are offered by the seller
@@ -60,19 +61,56 @@ module.exports = (dbPool) =>{
                             }
                         })
                     })
-
                 })
             })
         })
-
     }
+
+
+    let sellerInfo = (username, callback)=>{
+        let queryText="SELECT seller_id FROM sellers WHERE username=$1"
+        dbPool.query(queryText, [username], (err, res)=>{
+            if(err){
+                callback(err, null, null)
+                return
+            }
+            let queryText1 = "SELECT * FROM catalogue where seller_id=$1"
+            dbPool.query(queryText1,[res.rows[0].seller_id], (err1, res1)=>{
+                if(err){
+                    callback(err, null, null)
+                    return
+                }
+                let queryText2 = "SELECT * FROM sales WHERE seller_id=$1"
+                dbPool.query(queryText2, [res.rows[0].seller_id], (err2, res2)=>{
+                    callback(err2, res1, res2)
+                })
+            })
+        })
+    }
+
+    let getSaleInfo = (saleID, username, callback) =>{
+        let queryText = "SELECT * FROM (SELECT * FROM sales INNER JOIN sellers ON sales.seller_id=sellers.seller_id) AS sale_info WHERE sale_id=$1 AND username=$2"
+        dbPool.query(queryText, [saleID, username], (err, res)=>{
+            if(err){
+                callback(err, null, null)
+                return
+            }
+            let queryText1 = `SELECT * FROM sales_${saleID} INNER JOIN catalogue ON catalogue.item_id=sales_${saleID}.item_id`
+            dbPool.query(queryText1, (err1, res1)=>{
+                callback(err1, res, res1)
+            })
+        })
+    }
+
 
 
 
     return {
         postCatalogueForm,
         getSellerItems,
-        makeNewSales
+        makeNewSales,
+        sellerInfo,
+        getSaleInfo
 
     }
 }

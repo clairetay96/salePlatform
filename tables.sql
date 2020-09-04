@@ -17,7 +17,8 @@ CREATE TABLE IF NOT EXISTS orders (
 	seller_id INTEGER,
 	buyer_id INTEGER,
 	sale_id INTEGER,
-	object_id INTEGER);
+	item_id INTEGER,
+	quantity INTEGER);
 
 CREATE TABLE IF NOT EXISTS sales (
 	sale_id SERIAL PRIMARY KEY,

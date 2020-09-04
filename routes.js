@@ -15,24 +15,24 @@ module.exports = (app, allModels) => {
     app.post("/newacc/", noUserControllerFunc.postSignUp)
 
     //show seller page, catalogue, upcoming sales
-    app.get("/seller/:username")
+    app.get("/seller/:username", sellerControllerFunc.sellerPage)
 
     //render form for seller to create a new catalogue only if logged in
     app.get("/seller/catalogue/new", sellerControllerFunc.renderCatalogueForm)
     app.post("/seller/catalogue/new/", sellerControllerFunc.newCatalogueForm)
 
-    //list of all seller's sales
-    app.get("/seller/:username/sales")
-
     //render form for seller to create a new sale - will create a new table
     app.get("/seller/sales/new", sellerControllerFunc.renderSaleForm)
-    app.post("/seller/sales/new", sellerControllerFunc.newSaleForm)
+    app.post("/seller/sales/new/", sellerControllerFunc.newSaleForm)
 
     //sale page - shows products, prices, and button link to live page.
-    app.get("/seller/:username/sales/:id")
+    app.get("/seller/:username/sales/:id/", sellerControllerFunc.saleWaitingRoom)
 
     //only renders past a certain time.
-    app.get("/seller/:username/sales/:id/live")
+    app.get("/seller/:username/sales/:id/live", sellerControllerFunc.saleLivePage)
+
+    //updates the sale_id table
+    app.post("/seller/:username/sales/:id/live/")
 
 
 
