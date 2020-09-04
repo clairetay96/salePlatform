@@ -25,8 +25,8 @@ module.exports = (app, allModels) => {
     app.get("/seller/:username/sales")
 
     //render form for seller to create a new sale - will create a new table
-    app.get("/seller/:username/sales/new")
-    app.post("/seller/:username/sales/new")
+    app.get("/seller/sales/new", sellerControllerFunc.renderSaleForm)
+    app.post("/seller/sales/new", sellerControllerFunc.newSaleForm)
 
     //sale page - shows products, prices, and button link to live page.
     app.get("/seller/:username/sales/:id")
