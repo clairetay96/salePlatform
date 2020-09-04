@@ -21,11 +21,15 @@ const NeutralModelsObject = allNeutralFunction( pool );
 const allSellerFunction = require('./models/seller')
 const SellerModelsObject = allSellerFunction(pool)
 
+const allBuyerFunction = require('./models/buyer')
+const BuyerModelsObject = allBuyerFunction(pool)
+
 module.exports = {
   queryInterface: (text, params, callback) => {
     return pool.query(text, params, callback);
   },
   pool:pool,
   neutral: NeutralModelsObject,
-  seller: SellerModelsObject
+  seller: SellerModelsObject,
+  buyer: BuyerModelsObject
 };

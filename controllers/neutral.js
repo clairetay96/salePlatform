@@ -5,13 +5,22 @@ const SALT = "stay toasty"
 module.exports = (allModels) => {
 
     const db_neutral = allModels.neutral
+    const db_seller = allModels.seller
 
     let renderHome = (request, response) =>{
         if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']) {
             if(request.cookies['role']=="sellers"){
-                response.send("Seller is logged in. Create a new catalogue.")
+                db_seller.sellerInfoFromID(request.cookies['userID'], (err, catalogue, sales)=>{
+                    if(err){
+                        console.log(err.message)
+                        response.send("Error occurred.")
+                    } else {
+                        response.render('sellerhp', {catalogue, sales})
+                    }
+
+                })
             } else if(request.cookies['role']=="buyers"){
-                response.send("buyer is logged in")
+                response.send("Buyer is logged in.")
             }
         } else {
             response.render('homepage')

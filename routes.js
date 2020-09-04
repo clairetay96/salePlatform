@@ -1,6 +1,7 @@
 module.exports = (app, allModels) => {
     const noUserControllerFunc = require('./controllers/neutral')(allModels)
     const sellerControllerFunc = require('./controllers/seller')(allModels)
+    const buyerControllerFunc = require('./controllers/buyer')(allModels)
 
     //homepage - log in for neutral, tracked sales for buyers, own page for sellers
     app.get("/", noUserControllerFunc.renderHome)
@@ -31,8 +32,8 @@ module.exports = (app, allModels) => {
     //only renders past a certain time.
     app.get("/seller/:username/sales/:id/live", sellerControllerFunc.saleLivePage)
 
-    //updates the sale_id table
-    app.post("/seller/:username/sales/:id/live/")
+    //updates the sale_id table, adds to order table, then to order_details table
+    app.post("/seller/:username/sales/:id/live/", buyerControllerFunc.makePurchase)
 
 
 

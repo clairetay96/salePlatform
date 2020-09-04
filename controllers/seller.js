@@ -129,7 +129,7 @@ module.exports = (allModels) => {
             } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
                 response.send("This sale does not exist - did you get the username/sale ID right?")
             }else {
-                response.render("saleLivePage", {sale: saleInfo, items: saleItems})
+                response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username})
             }
 
         })

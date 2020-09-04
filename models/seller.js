@@ -66,6 +66,20 @@ module.exports = (dbPool) =>{
         })
     }
 
+    let sellerInfoFromID = (seller_id, callback) =>{
+        let queryText1 = "SELECT * FROM catalogue where seller_id=$1"
+            dbPool.query(queryText1,[seller_id], (err1, res1)=>{
+                if(err1){
+                    callback(err1, null, null)
+                    return
+                }
+                let queryText2 = "SELECT * FROM sales WHERE seller_id=$1"
+                dbPool.query(queryText2, [seller_id], (err2, res2)=>{
+                    callback(err2, res1, res2)
+                })
+            })
+        }
+
 
     let sellerInfo = (username, callback)=>{
         let queryText="SELECT seller_id FROM sellers WHERE username=$1"
@@ -74,19 +88,11 @@ module.exports = (dbPool) =>{
                 callback(err, null, null)
                 return
             }
-            let queryText1 = "SELECT * FROM catalogue where seller_id=$1"
-            dbPool.query(queryText1,[res.rows[0].seller_id], (err1, res1)=>{
-                if(err){
-                    callback(err, null, null)
-                    return
-                }
-                let queryText2 = "SELECT * FROM sales WHERE seller_id=$1"
-                dbPool.query(queryText2, [res.rows[0].seller_id], (err2, res2)=>{
-                    callback(err2, res1, res2)
-                })
-            })
+            sellerInfoFromID(res.rows[0].seller_id, callback)
         })
     }
+
+
 
     let getSaleInfo = (saleID, username, callback) =>{
         let queryText = "SELECT * FROM (SELECT * FROM sales INNER JOIN sellers ON sales.seller_id=sellers.seller_id) AS sale_info WHERE sale_id=$1 AND username=$2"
@@ -110,7 +116,8 @@ module.exports = (dbPool) =>{
         getSellerItems,
         makeNewSales,
         sellerInfo,
-        getSaleInfo
+        getSaleInfo,
+        sellerInfoFromID
 
     }
 }
