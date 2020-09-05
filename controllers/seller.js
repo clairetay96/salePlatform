@@ -92,13 +92,13 @@ module.exports = (allModels) => {
     }
 
     let sellerPage = (request, response)=>{
-        let sellerName = request.params.username
-        db_seller.sellerInfo(sellerName, (err, seller_items, seller_sales)=>{
+        let seller_username = request.params.username
+        db_seller.sellerInfo(seller_username, (err, seller_items, seller_sales)=>{
             if(err){
                 console.log(err.message)
                 response.send("Error occured.")
             } else {
-                response.render('sellerPage', {items: seller_items, sales: seller_sales})
+                response.render('sellerPage', {items: seller_items, sales: seller_sales, seller_username})
             }
         })
     }
@@ -114,7 +114,7 @@ module.exports = (allModels) => {
             } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
                 response.send("This sale does not exist - did you get the username/sale ID right?")
             }else {
-                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems})
+                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username})
             }
         })
     }

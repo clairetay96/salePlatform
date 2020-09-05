@@ -6,6 +6,7 @@ module.exports = (allModels) => {
 
     const db_neutral = allModels.neutral
     const db_seller = allModels.seller
+    const db_buyer = allModels.buyer
 
     let renderHome = (request, response) =>{
         if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']) {
@@ -20,7 +21,7 @@ module.exports = (allModels) => {
 
                 })
             } else if(request.cookies['role']=="buyers"){
-                response.send("Buyer is logged in.")
+                response.send("Buyer logged in.")
             }
         } else {
             response.render('homepage')
@@ -71,11 +72,19 @@ module.exports = (allModels) => {
 
     }
 
+    let logout = (request, response) =>{
+        response.clearCookie('userID')
+        response.clearCookie('role')
+        response.clearCookie('sessionCookie')
+        response.redirect("/")
+    }
+
     return {
         renderHome,
         renderSignUp,
         postSignUp,
-        logIn
+        logIn,
+        logout
     }
 
 }

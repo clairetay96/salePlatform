@@ -18,8 +18,8 @@ class Homepage extends React.Component {
                         <div>
                             <h3>Log in</h3>
                             <form method="POST" action="/login">
-                                New Username: <input type="text" name="username"/> <br/><br/>
-                                New Password: <input type="password" name="password"/> <br/><br/>
+                                Username: <input type="text" name="username"/> <br/><br/>
+                                Password: <input type="password" name="password"/> <br/><br/>
                                 Role: <select name="role">
                                     <option value="buyers">Buyer</option>
                                     <option value="sellers">Seller</option>

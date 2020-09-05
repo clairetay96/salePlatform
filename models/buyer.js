@@ -75,14 +75,56 @@ module.exports = (dbPool) =>{
 
             })
 
+    }
+
+    let trackSaleQuery = (buyerID, saleID, sellerUsername, callback) =>{
+        //check if sale exists
+        let queryText = "SELECT * FROM (sales INNER JOIN sellers ON sales.seller_id=sellers.seller_id) AS sales_by_sellers WHERE username=$1 AND sale_id=$2"
+        dbPool.query(queryText, [sellerUsername, saleID])
+            .then((res)=>{
+                if(res.rows.length==0){
+                    callback(null, false, null)
+                } else {
+                    let values = [saleID, buyerID]
+                    let queryText1 = "INSERT INTO sale_tracker(sale_id, buyer_id) VALUES($1,$2)"
+                    dbPool.query(queryText1, values)
+                        .then((res1)=>{callback(null, true, res)})
+                        .catch((err1)=>{callback(err1, null, null)})
+                }
+            })
+            .catch((err)=>{callback(err, null, null)})
+    }
+
+    let trackSellerQuery = (buyerID, sellerUsername, callback) => {
+        let queryText = "SELECT * FROM sellers WHERE username=$1"
+        dbPool.query(queryText, [sellerUsername])
+            .then((res)=>{
+                if(res.rows.length==0){
+                    callback(null, false, null)
+                } else {
+                    let seller_id = res.rows[0].seller_id
+                    let values = [seller_id, buyerID]
+                    let queryText1 = "INSERT INTO seller_tracker(seller_id, buyer_id) VALUES($1,$2)"
+                    dbPool.query(queryText1, values)
+                        .then((res1)=>{callback(null, true, res)})
+                        .catch((err1)=>{callback(err1, null, null)})
+                }
+            })
+            .catch((err)=>{callback(err, null, null)})
+
+    }
 
 
+    let buyerInfoFromID = (buyerID, callback)=> {
 
     }
 
 
 
     return {
-        purchaseMaker
+        purchaseMaker,
+        trackSaleQuery,
+        trackSellerQuery,
+        buyerInfoFromID
     }
 }

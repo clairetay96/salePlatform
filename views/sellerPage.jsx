@@ -1,10 +1,12 @@
 import React from 'react'
 import CatalogueItemInput from './components/catalogueInput.jsx'
+import TrackSeller from './components/trackSellerButton.jsx'
 
 class SellerPage extends React.Component {
     render() {
         let allItems = this.props.items.rows
         let allSales = this.props.sales.rows
+        let seller_username = this.props.seller_username
         console.log(allItems,allSales)
 
         let allItemsHTML = allItems.map((item)=>{
@@ -17,6 +19,7 @@ class SellerPage extends React.Component {
 
         return (
             <div>
+            <TrackSeller seller_username={seller_username} />
             Items:
                 {allItemsHTML}
                 <br/>

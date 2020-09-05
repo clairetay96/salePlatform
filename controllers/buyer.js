@@ -8,8 +8,12 @@ module.exports = (allModels) => {
     const db_seller = allModels.seller
     const db_buyer = allModels.buyer
 
+    let buyerLoggedIn = (request) =>{
+        return (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="buyers")
+    }
+
     let makePurchase = (request, response) =>{
-        if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="buyers") {
+        if (buyerLoggedIn(request)) {
 
             //first split up the queries that need to be made to alter the sale table
             let x = request.body
@@ -23,7 +27,6 @@ module.exports = (allModels) => {
                     queries.push(values)
                 }
             })
-            console.log(queries)
 
             db_buyer.purchaseMaker(queries, sellerID, saleID, request.cookies['userID'], (err,orderID, soldOut)=>{
                 if(err){
@@ -42,9 +45,53 @@ module.exports = (allModels) => {
         }
     }
 
+    let trackSale = (request, response) => {
+        if (buyerLoggedIn(request)){
+            let buyerID = request.cookies['userID']
+            let saleID = request.params.id
+            let sellerUsername = request.params.username
+            db_buyer.trackSaleQuery(buyerID, saleID, sellerUsername, (err, saleExists, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if(!saleExists){
+                    response.send("The sale you are trying to track does not exist.")
+                } else {
+                    response.send("Sale follow successful.")
+                }
+            })
+        } else {
+            response.send("You need to be logged in as a buyer to track a sale.")
+        }
+
+    }
+
+    let trackSeller = (request, response) => {
+        if (buyerLoggedIn(request)){
+            let buyerID = request.cookies['userID']
+            let sellerUsername = request.params.username
+            db_buyer.trackSellerQuery(buyerID, sellerUsername, (err, userExists,res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if(!userExists){
+                    response.send("The user you are trying to track does not exist.")
+                } else {
+                    response.send("Seller follow successful.")
+                }
+            })
+        } else {
+            response.send("You need to be logged in as a buyer to track a sale.")
+        }
+
+    }
+
 
     return {
-        makePurchase
+        buyerLoggedIn,
+        makePurchase,
+        trackSale,
+        trackSeller
     }
 
 }

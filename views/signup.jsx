@@ -10,9 +10,10 @@ class SignUp extends React.Component {
                 </head>
                 <body>
                     <form method="POST" action="/newacc/">
-                        Username: <input type="text" name="username"/> <br/><br/>
-                        Password: <input type="password" name="password"/> <br/><br/>
+                        New Username: <input type="text" name="username"/> <br/><br/>
+                        New Password: <input type="password" name="password"/> <br/><br/>
                         Role: <select name="role">
+                            <option disabled selected value>  --Select an option--  </option>
                             <option value="buyers">Buyer</option>
                             <option value="sellers">Seller</option>
                             </select><br/><br/>
