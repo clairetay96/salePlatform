@@ -2,6 +2,11 @@ import React from 'react'
 
 class Homepage extends React.Component {
     render() {
+        let buyerUsername = this.props.buyer.rows[0].username
+        let buyersSalesTr = this.props['sales_tracked'].rows
+        let buyersSellersTr = this.props['sellers_tracked'].rows
+        let buyersOrders = this.props.orders.rows
+
         return (
             <html>
                 <head>
@@ -9,28 +14,9 @@ class Homepage extends React.Component {
                     <link rel="stylesheet" type="text/css" href="/homepage.css"/>
                 </head>
                 <body>
-                    <div className="hp-flexcontainer">
-                        <div>
-                        Hayaku!
-                        <p>Hyper-fast sales, made even quicker.</p>
-                        </div>
+                This is {buyerUsername}'s' homepage.
 
-                        <div>
-                            <h3>Log in</h3>
-                            <form method="POST" action="/login">
-                                New Username: <input type="text" name="username"/> <br/><br/>
-                                New Password: <input type="password" name="password"/> <br/><br/>
-                                Role: <select name="role">
-                                    <option value="buyers">Buyer</option>
-                                    <option value="sellers">Seller</option>
-                                    </select><br/><br/>
-                                <input type="submit"/>
-                            </form>
-                            <div className="signup-prompt">
-                                Don't have an account? <a href="/newacc">Sign up here.</a>
-                            </div>
-                        </div>
-                    </div>
+                    {buyersSellersTr[0].sale_id}
                 </body>
             </html>)
     }

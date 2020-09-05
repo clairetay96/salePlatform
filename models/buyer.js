@@ -1,5 +1,6 @@
 module.exports = (dbPool) =>{
 
+
     //must alter the sale table, insert into order table and order_details table.
     let purchaseMaker = (queries, sellerID, saleID, buyerID, callback)=>{
         //back-end authentication
@@ -59,7 +60,6 @@ module.exports = (dbPool) =>{
                                                 return
                                             }
                                         })
-
                                     })
                                     callback(null, orderID, failedQueries)
                                 }
@@ -95,8 +95,27 @@ module.exports = (dbPool) =>{
             .catch((err)=>{callback(err, null, null)})
     }
 
+    let removeTrackSale = (buyerID, saleID, sellerUsername, callback) =>{
+        let queryText = "SELECT * FROM (sales INNER JOIN sellers ON sales.seller_id=sellers.seller_id) AS sales_by_sellers WHERE username=$1 AND sale_id=$2"
+        dbPool.query(queryText, [sellerUsername, saleID])
+            .then((res)=>{
+                if(res.rows.length==0){
+                    callback(null, false, null)
+                } else {
+                    let queryText2 = "DELETE FROM sale_tracker WHERE buyer_id=$1 AND sale_id=$2"
+                    dbPool.query(queryText2, [buyerID, saleID])
+                        .then(res1 => {
+                            callback(null, true, res1)
+                        })
+
+                }
+            })
+            .catch((err)=>{callback(err, null, null)})
+
+    }
+
     let trackSellerQuery = (buyerID, sellerUsername, callback) => {
-        let queryText = "SELECT * FROM sellers WHERE username=$1"
+        let queryText = "SELECT * FROM sellers WHERE username=$1 LIMIT 1"
         dbPool.query(queryText, [sellerUsername])
             .then((res)=>{
                 if(res.rows.length==0){
@@ -114,9 +133,50 @@ module.exports = (dbPool) =>{
 
     }
 
+    let removeTrackSeller = (buyerID, sellerUsername, callback) => {
+        let queryText = "SELECT * FROM sellers WHERE username=$1"
+        dbPool.query(queryText, [sellerUsername])
+            .then((res)=>{
+                if(res.rows.length==0){
+                    callback(null, false, null)
+                } else {
+                    let seller_id = res.rows[0].seller_id
+                    let values = [seller_id, buyerID]
+                    let queryText1 = "DELETE FROM seller_tracker WHERE seller_id=$1 AND buyer_id=$2"
+                    dbPool.query(queryText1, values)
+                        .then((res1)=>{callback(null, true, res)})
+                        .catch((err1)=>{callback(err1, null, null)})
+                }
+            })
+            .catch((err)=>{callback(err, null, null)})
+
+    }
+
 
     let buyerInfoFromID = (buyerID, callback)=> {
+        let allQueries = []
+        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT buyer_id, foo.seller_id,username,sale_id,time_live FROM (SELECT buyer_id, seller_tracker.seller_id,username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON foo.seller_id=sales.seller_id) AS bar', 'orders']
 
+        tables.forEach((table)=>{
+            let queryText = `SELECT * FROM ${table} WHERE buyer_id=$1`
+            allQueries.push(
+                dbPool.query(queryText, [buyerID])
+                    .then(res=>res)
+                    .catch(err=>{callback(err, null)})
+                )
+        })
+
+        Promise.all(allQueries)
+            .then((allQueries)=>{
+                let buyerInfo = {
+                    buyer: allQueries[0],
+                    sales_tracked: allQueries[1],
+                    sellers_tracked: allQueries[2],
+                    orders: allQueries[3]
+                }
+                callback(null, buyerInfo)
+            })
+            .catch((err)=>{callback(err,null)})
     }
 
 
@@ -124,7 +184,9 @@ module.exports = (dbPool) =>{
     return {
         purchaseMaker,
         trackSaleQuery,
+        removeTrackSale,
         trackSellerQuery,
+        removeTrackSeller,
         buyerInfoFromID
     }
 }

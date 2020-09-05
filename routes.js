@@ -17,10 +17,10 @@ module.exports = (app, allModels) => {
     app.post("/newacc/", noUserControllerFunc.postSignUp)
 
     //show seller page, catalogue, upcoming sales
-    app.get("/seller/:username", sellerControllerFunc.sellerPage)
-    //if buyer is logged in, can follow a seller
+    app.get("/seller/:username", noUserControllerFunc.sellerPage)
+    //if buyer is logged in, can follow/unfollow a seller
     app.post("/seller/:username/track", buyerControllerFunc.trackSeller)
-
+    app.delete("/seller/:username/track", buyerControllerFunc.untrackSeller)
 
     //render form for seller to create a new catalogue only if seller logged in
     app.get("/seller/catalogue/new", sellerControllerFunc.renderCatalogueForm)
@@ -31,12 +31,14 @@ module.exports = (app, allModels) => {
     app.post("/seller/sales/new/", sellerControllerFunc.newSaleForm)
 
     //sale page - shows products, prices, and button link to live page.
-    app.get("/seller/:username/sales/:id/", sellerControllerFunc.saleWaitingRoom)
-    //if buyer is logged in can track a sale.
-    app.post("/seller/:username/sales/:id/track", buyerControllerFunc.trackSale)
+    app.get("/seller/:username/sales/:id/", noUserControllerFunc.saleWaitingRoom)
 
-    //only renders past a certain time.
-    app.get("/seller/:username/sales/:id/live", sellerControllerFunc.saleLivePage)
+    //if buyer is logged in can track a sale, and delete tracking
+    app.post("/seller/:username/sales/:id/track", buyerControllerFunc.trackSale)
+    app.delete("/seller/:username/sales/:id/track", buyerControllerFunc.untrackSale)
+
+    //only renders past a certain time, for buyers only
+    app.get("/seller/:username/sales/:id/live", buyerControllerFunc.saleLivePage)
 
     //updates the sale_id table, adds to order table, then to order_details table
     app.post("/seller/:username/sales/:id/live/", buyerControllerFunc.makePurchase)

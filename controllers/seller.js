@@ -6,8 +6,12 @@ module.exports = (allModels) => {
 
     const db_seller = allModels.seller
 
+    let sellerLoggedIn = (request) =>{
+        return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"
+    }
+
     let renderCatalogueForm = (request, response) =>{
-        if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"){
+        if (sellerLoggedIn(request)){
             response.render('catalogueform', {seller_id: request.cookies['userID']})
         } else {
             response.send("You do not have permission to view this page.")
@@ -18,7 +22,8 @@ module.exports = (allModels) => {
     let newCatalogueForm = (request, response) =>{
         let x = request.body
         let sellerID = x.seller_id
-        if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"&&request.cookies['userID']==sellerID){
+
+        if (sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
             let allInput = []
             Object.keys(x).forEach((item)=>{
                 if(item.includes("item_name")){
@@ -40,10 +45,8 @@ module.exports = (allModels) => {
         }
     }
 
-
-
     let renderSaleForm = (request, response)=>{
-        if(sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers") {
+        if(sellerLoggedIn(request)) {
             //request from db a list of seller's items - use that to render options.
             db_seller.getSellerItems(request.cookies['userID'], (err, res)=>{
                 if(err){
@@ -62,7 +65,7 @@ module.exports = (allModels) => {
     let newSaleForm = (request, response) =>{
         let x = request.body
         let sellerID = x.seller_id
-        if(sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"&&request.cookies['userID']==sellerID){
+        if(sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
             let inputRows = []
             let datesLive =[]
             Object.keys(x).forEach((item)=>{
@@ -91,61 +94,18 @@ module.exports = (allModels) => {
         }
     }
 
-    let sellerPage = (request, response)=>{
-        let seller_username = request.params.username
-        db_seller.sellerInfo(seller_username, (err, seller_items, seller_sales)=>{
-            if(err){
-                console.log(err.message)
-                response.send("Error occured.")
-            } else {
-                response.render('sellerPage', {items: seller_items, sales: seller_sales, seller_username})
-            }
-        })
-    }
 
 
-    let saleWaitingRoom = (request, response)=>{
-        let saleID = request.params.id
-        let seller_username = request.params.username
-        db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
-            if(err){
-                console.log(err.message)
-                response.send("Error occurred.")
-            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.send("This sale does not exist - did you get the username/sale ID right?")
-            }else {
-                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username})
-            }
-        })
-    }
 
-    let saleLivePage = (request, response) =>{
-        let saleID = request.params.id
-        let seller_username = request.params.username
-        db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
-            if(err){
-                console.log(err.message)
-                response.send("Error occurred.")
-            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.send("This sale does not exist - did you get the username/sale ID right?")
-            }else {
-                response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username})
-            }
 
-        })
-
-    }
 
 
     return {
+        sellerLoggedIn,
         renderCatalogueForm,
         newCatalogueForm,
         renderSaleForm,
-        newSaleForm,
-        sellerPage,
-        saleWaitingRoom,
-        saleLivePage
-
+        newSaleForm
     }
 
 }

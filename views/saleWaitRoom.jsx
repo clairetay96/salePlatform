@@ -1,6 +1,7 @@
 import React from 'react'
 import LogoutButton from './components/logout.jsx'
 import TrackSaleButton from './components/trackSaleButton.jsx'
+import UntrackSaleButton from './components/untrackSaleButton.jsx'
 
 class SaleWaitRoom extends React.Component {
     render() {
@@ -8,6 +9,12 @@ class SaleWaitRoom extends React.Component {
         let saleInfo = this.props.sale.rows[0]
         let saleID = saleInfo.sale_id
         let seller_username = this.props.seller_username
+        let isFollowing = this.props.isFollowing
+
+        let followSaleButton = <TrackSaleButton seller_username={seller_username} sale_id={saleID}/>;
+        if(isFollowing){
+            followSaleButton = <UntrackSaleButton seller_username={seller_username} sale_id={saleID}/>
+        }
 
         let allItemsHTML = allItems.map((item)=>{
             return <li>{item.item_name}</li>
@@ -16,7 +23,7 @@ class SaleWaitRoom extends React.Component {
         return (
             <div>
                 <LogoutButton />
-                <TrackSaleButton seller_username={seller_username} sale_id={saleID}/>
+                {followSaleButton}
                 <h1>Waiting Room for Sale!</h1>
                 Items available:
                 <ul>

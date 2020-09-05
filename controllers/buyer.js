@@ -57,12 +57,34 @@ module.exports = (allModels) => {
                 } else if(!saleExists){
                     response.send("The sale you are trying to track does not exist.")
                 } else {
-                    response.send("Sale follow successful.")
+                    response.redirect('back')
                 }
             })
         } else {
             response.send("You need to be logged in as a buyer to track a sale.")
         }
+    }
+
+    let untrackSale = (request, response) => {
+        if(buyerLoggedIn(request)){
+            let saleID = request.params.id
+            let sellerUsername = request.params.username
+            let buyerID = request.cookies['userID']
+            db_buyer.removeTrackSale(buyerID, saleID, sellerUsername, (err, saleExists, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if(!saleExists){
+                    response.send("The sale you are trying to untrack does not exist. It might have been deleted by the seller.")
+                } else {
+                    response.redirect('back')
+                }
+            })
+
+        } else {
+            response.send("You do not have permission to perform this action.")
+        }
+
 
     }
 
@@ -77,21 +99,65 @@ module.exports = (allModels) => {
                 } else if(!userExists){
                     response.send("The user you are trying to track does not exist.")
                 } else {
-                    response.send("Seller follow successful.")
+                    response.redirect('back')
                 }
             })
         } else {
             response.send("You need to be logged in as a buyer to track a sale.")
         }
+    }
+
+    let untrackSeller = (request, response) =>{
+        if (buyerLoggedIn(request)){
+            let buyerID = request.cookies['userID']
+            let sellerUsername = request.params.username
+            db_buyer.removeTrackSeller(buyerID, sellerUsername, (err, userExists,res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if(!userExists){
+                    response.send("The user you are trying to track does not exist.")
+                } else {
+                    response.redirect('back')
+                }
+            })
+        } else {
+            response.send("You do not have permission to perform this action.")
+        }
 
     }
+
+    let saleLivePage = (request, response) =>{
+        if(buyerLoggedIn(request)){
+            let saleID = request.params.id
+            let seller_username = request.params.username
+            db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
+                    response.send("This sale does not exist - did you get the username/sale ID right?")
+                }else {
+                    response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username})
+                }
+            })
+        } else {
+            response.send("This page is available for buyers only.")
+        }
+
+    }
+
+
 
 
     return {
         buyerLoggedIn,
         makePurchase,
         trackSale,
-        trackSeller
+        untrackSale,
+        trackSeller,
+        untrackSeller,
+        saleLivePage
     }
 
 }

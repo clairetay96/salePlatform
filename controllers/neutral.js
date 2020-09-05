@@ -8,20 +8,38 @@ module.exports = (allModels) => {
     const db_seller = allModels.seller
     const db_buyer = allModels.buyer
 
+    loggedIn = (request) =>{
+        return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']
+    }
+
+    let isBuyer = (request) => {
+        if(request.cookies['role']=="buyers"){
+            return request.cookies['userID']
+        }
+        return null
+    }
+
     let renderHome = (request, response) =>{
-        if (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']) {
+        if (loggedIn(request)) {
             if(request.cookies['role']=="sellers"){
-                db_seller.sellerInfoFromID(request.cookies['userID'], (err, catalogue, sales)=>{
+                db_seller.sellerInfoFromID(request.cookies['userID'], (err, sellerInfo)=>{
                     if(err){
                         console.log(err.message)
                         response.send("Error occurred.")
                     } else {
-                        response.render('sellerhp', {catalogue, sales})
+                        response.render('sellerhp', sellerInfo)
                     }
 
                 })
             } else if(request.cookies['role']=="buyers"){
-                response.send("Buyer logged in.")
+                db_buyer.buyerInfoFromID(request.cookies['userID'], (err, userInfo)=>{
+                    if(err){
+                        console.log(err.message)
+                        response.send("Error occurred.")
+                    } else {
+                        response.render('buyerhp', userInfo)
+                    }
+                })
             }
         } else {
             response.render('homepage')
@@ -53,7 +71,12 @@ module.exports = (allModels) => {
     }
 
     let renderSignUp = (request, response) => {
-        response.render('signup')
+        if(!loggedIn(request)) {
+            response.render('signup')
+        } else {
+            response.send("You are logged in. Log out to create a new account.")
+        }
+
     }
 
     let postSignUp = (request, response) => {
@@ -72,6 +95,36 @@ module.exports = (allModels) => {
 
     }
 
+    let saleWaitingRoom = (request, response)=>{
+        let saleID = request.params.id
+        let seller_username = request.params.username
+        db_seller.getSaleInfo(saleID, seller_username, isBuyer(request), (err, saleInfo, saleItems, isFollowing)=>{
+            if(err){
+                console.log(err.message)
+                response.send("Error occurred.")
+            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
+                response.send("This sale does not exist - did you get the username/sale ID right?")
+            }else {
+                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing})
+            }
+        })
+    }
+
+    let sellerPage = (request, response)=>{
+        let seller_username = request.params.username
+        db_seller.sellerInfo(seller_username, isBuyer(request), (err, sellerInfo, isFollowing)=>{
+            if(err){
+                console.log(err.message)
+                response.send("Error occured.")
+            } else {
+                sellerInfo.isFollowing = isFollowing
+                sellerInfo.seller_username = seller_username
+                console.log(sellerInfo)
+                response.render('sellerPage', sellerInfo)
+            }
+        })
+    }
+
     let logout = (request, response) =>{
         response.clearCookie('userID')
         response.clearCookie('role')
@@ -80,11 +133,15 @@ module.exports = (allModels) => {
     }
 
     return {
+        loggedIn,
+        isBuyer,
         renderHome,
         renderSignUp,
         postSignUp,
         logIn,
-        logout
+        logout,
+        saleWaitingRoom,
+        sellerPage
     }
 
 }
