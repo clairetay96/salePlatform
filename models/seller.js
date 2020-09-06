@@ -52,7 +52,7 @@ module.exports = (dbPool) =>{
         })
     }
 
-    let makeNewSales = (seller_id, datesLive, inputRows, callback)=>{
+    let makeNewSales = (seller_id, sale_name, sale_desc, datesLive, inputRows, callback)=>{
         //check if all item ids are offered by the seller
         inputRows.forEach((item)=>{
             let queryText = "SELECT * FROM catalogue WHERE seller_id=$1 AND item_id=$2"
@@ -68,8 +68,8 @@ module.exports = (dbPool) =>{
         })
         //now add the sale into the sale table AND create indiv sale tables.
         datesLive.forEach((item)=>{
-            let queryText1 = "INSERT INTO sales (seller_id, time_live, sold_out) VALUES($1,$2,'false') RETURNING sale_id"
-            dbPool.query(queryText1, [seller_id, item], (err1, res1)=>{
+            let queryText1 = "INSERT INTO sales (seller_id, time_live, sold_out, sale_name, sale_desc) VALUES($1,$2,'false', $3,$4) RETURNING sale_id"
+            dbPool.query(queryText1, [seller_id, item, sale_name, sale_desc], (err1, res1)=>{
                 if(err1){
                     callback(err1, null,null)
                     return
@@ -98,7 +98,8 @@ module.exports = (dbPool) =>{
 
     let sellerInfoFromID = (seller_id, callback) =>{
         let returnedValues = []
-        let tables = ['catalogue', 'sales', 'seller_tracker']
+        let tables = ['catalogue', 'sales', 'seller_tracker', 'sellers']
+        let seller_username;
 
         tables.forEach((table)=>{
             let queryText = `SELECT * FROM ${table} WHERE seller_id=$1`
@@ -115,7 +116,9 @@ module.exports = (dbPool) =>{
                 let sellerInfo = {
                     catalogue: returnedValues[0],
                     sales: returnedValues[1],
-                    followers: returnedValues[2]
+                    followers: returnedValues[2],
+                    username: returnedValues[3].rows[0].username
+
                 }
                 callback(null, sellerInfo, null)
             })
@@ -178,11 +181,66 @@ module.exports = (dbPool) =>{
                     queryText2 = "SELECT * FROM sale_tracker WHERE buyer_id=$1 AND sale_id=$2"
                     dbPool.query(queryText2, [isBuyerID,saleID], (err2, res2)=>{
                         callback(err2, res, res1, res2.rows.length>0)
+                        return [res, res1]
                     })
                 }
 
             })
         })
+    }
+
+    let renderEditSaleForm = (sellerID, saleID, callback)=>{
+        let allQueries = []
+
+        let queryText = "SELECT * FROM catalogue WHERE seller_id=$1"
+        allQueries.push(dbPool.query(queryText, [sellerID])
+            .then(res=>res)
+            .catch(err=>callback(err, null)))
+
+        let queryText1 = "SELECT * FROM sales WHERE sale_id=$1"
+        allQueries.push(dbPool.query(queryText1, [saleID])
+            .then(res=>res)
+            .catch(err=>callback(err, null)))
+
+        let queryText2 = `SELECT * FROM sales_${saleID}`
+        allQueries.push(dbPool.query(queryText1, [saleID])
+            .then(res=>res)
+            .catch(err=>{callback(err, null)}))
+
+        Promise.all(allQueries)
+            .then(res=>callback(null, res))
+            .catch(err=>{callback(err, null)})
+
+    }
+
+    let updateSaleInfo = (inputRows,saleID,sellerID,saleInfo,callback)=>{
+        let allQueries = []
+
+        let queryText = "UPDATE sales SET time_live=$1, sale_name=$2, sale_desc=$3 WHERE sale_id=$4 AND seller_id=$5"
+        allQueries.push(dbPool.query(queryText, saleInfo)
+                .then(res=>res)
+                .catch(err=>callback(err, null)))
+
+        let table = "sales_"+saleID
+        let queryText1 = `DELETE FROM ${table}`
+        dbPool.query(queryText1)
+            .then(res=>{
+                inputRows.forEach((item)=>{
+                    let queryText2 =`INSERT INTO ${table} (item_id, quantity,max_order) VALUES ($1,$2,$3)`
+                    allQueries.push(dbPool.query(queryText2, item)
+                                        .then(res=>res)
+                                        .catch(err=>{callback(err, null)}))
+        })
+
+            })
+            .catch(err=>{callback(err, null)})
+
+
+
+        Promise.all(allQueries)
+            .then(res=>{callback(null, res)})
+            .catch(err=>{callback(err, null)})
+
     }
 
 
@@ -195,7 +253,9 @@ module.exports = (dbPool) =>{
         makeNewSales,
         sellerInfo,
         getSaleInfo,
-        sellerInfoFromID
+        sellerInfoFromID,
+        renderEditSaleForm,
+        updateSaleInfo
 
     }
 }

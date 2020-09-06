@@ -1,13 +1,17 @@
 import React from 'react'
+import Head from './components/Head.jsx'
+import NavBar from './components/navBar.jsx'
 
 class SignUp extends React.Component {
     render() {
+
+        let loggedIn = false
+
         return (
             <html>
-                <head>
-                    <title>Hayaku: Signup</title>
-                </head>
+                <Head />
                 <body>
+                <NavBar loggedIn={loggedIn}/>
                     <form method="POST" action="/user/new/">
                         New Username: <input type="text" name="username"/> <br/><br/>
                         New Password: <input type="password" name="password"/> <br/><br/>

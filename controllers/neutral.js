@@ -27,6 +27,7 @@ module.exports = (allModels) => {
                         console.log(err.message)
                         response.send("Error occurred.")
                     } else {
+                        sellerInfo.loggedIn = true
                         response.render('sellerhp', sellerInfo)
                     }
 
@@ -37,6 +38,7 @@ module.exports = (allModels) => {
                         console.log(err.message)
                         response.send("Error occurred.")
                     } else {
+                        userInfo.loggedIn = true
                         response.render('buyerhp', userInfo)
                     }
                 })
@@ -105,7 +107,7 @@ module.exports = (allModels) => {
             } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
                 response.send("This sale does not exist - did you get the username/sale ID right?")
             }else {
-                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing})
+                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: true})
             }
         })
     }
@@ -119,6 +121,7 @@ module.exports = (allModels) => {
             } else {
                 sellerInfo.isFollowing = isFollowing
                 sellerInfo.seller_username = seller_username
+                sellerInfo.loggedIn = true
                 response.render('sellerPage', sellerInfo)
             }
         })

@@ -1,31 +1,36 @@
 import React from 'react'
-const path = require('path')
+import Head from './components/Head.jsx'
+import NavBar from './components/navBar.jsx'
 
 class SellerCatalogue extends React.Component {
     render() {
+        let loggedIn = this.props.loggedIn
         let allItemsHTML = <div></div>
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
-                return (<a href={item.item_id}><p>{item.item_name}</p></a>)
+                return (<p>{item.item_name}  <a href={item.item_id}>Edit</a></p>)
             })
 
         }
         return (
             <html>
-                <head></head>
+                <Head />
                 <body>
+                <NavBar loggedIn={loggedIn}/>
                     <div>
 
-
-                            <div className="allItems">
-                                {allItemsHTML}
-                            </div>
-                            <div>
+                        <h1>Your Catalogue</h1>
+                         <div>
                             <a href="new">Add a new item</a>
                             </div>
                             <div>
                             <a href="all">Edit all items</a>
                             </div>
+                            <div className="allItems">
+                            <h3>Your items</h3>
+                                {allItemsHTML}
+                            </div>
+
 
                     </div>
                 </body>

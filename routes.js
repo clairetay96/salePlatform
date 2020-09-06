@@ -53,10 +53,10 @@ module.exports = (app, allModels) => {
     app.get("/seller/:username/sales/:id/", noUserControllerFunc.saleWaitingRoom)
 
     //edit sale_id table
-    app.get("/seller/:username/sales/:id/edit")
-    app.put("/seller/:username/sales/:id/edit")
+    app.get("/seller/:username/sales/:id/edit", sellerControllerFunc.renderEditSaleForm)
+    app.put("/seller/:username/sales/:id/edit", sellerControllerFunc.updateSale)
     //edit sales table, drop sale_id table.
-    app.delete("/seller/:username/sales/:id/delete")
+    app.delete("/seller/:username/sales/:id/delete", sellerControllerFunc.deleteSale)
 
     //if buyer is logged in can track a sale, and delete tracking
     app.post("/seller/:username/sales/:id/track", buyerControllerFunc.trackSale)

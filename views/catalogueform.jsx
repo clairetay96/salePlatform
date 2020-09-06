@@ -1,8 +1,11 @@
 import React from 'react'
 import CatalogueItemInput from './components/catalogueInput.jsx'
+import Head from './components/Head.jsx'
+import NavBar from './components/navBar.jsx'
 
 class CatalogueForm extends React.Component {
     render() {
+        let loggedIn = this.props.loggedIn
 
         let allItemsHTML = <CatalogueItemInput />
         if(this.props.sellerItems){
@@ -20,8 +23,9 @@ class CatalogueForm extends React.Component {
         }
         return (
             <html>
-                <head></head>
+                <Head />
                 <body>
+                <NavBar loggedIn={loggedIn}/>
                     <div>
                         <form method="POST" action="/seller/catalogue/edit/">
 

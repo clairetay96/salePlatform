@@ -1,5 +1,7 @@
 import React from 'react'
 import LogoutButton from './components/logout.jsx'
+import Head from './components/Head.jsx'
+import NavBar from './components/navBar.jsx'
 import TrackSaleButton from './components/trackSaleButton.jsx'
 import UntrackSaleButton from './components/untrackSaleButton.jsx'
 
@@ -10,6 +12,7 @@ class SaleWaitRoom extends React.Component {
         let saleID = saleInfo.sale_id
         let seller_username = this.props.seller_username
         let isFollowing = this.props.isFollowing
+        let loggedIn = this.props.loggedIn
 
         let followSaleButton = <TrackSaleButton seller_username={seller_username} sale_id={saleID}/>;
         if(isFollowing){
@@ -22,10 +25,10 @@ class SaleWaitRoom extends React.Component {
 
         return (
             <html>
-                <head></head>
+                <Head />
                 <body>
+                <NavBar loggedIn={loggedIn}/>
                     <div>
-                        <LogoutButton />
                         {followSaleButton}
                         <h1>Waiting Room for Sale!</h1>
                         Items available:

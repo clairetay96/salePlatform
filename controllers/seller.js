@@ -18,9 +18,9 @@ module.exports = (allModels) => {
                     console.log(err.message)
                     response.send("Error occurred.")
                 } else if (res.rows.length==0){
-                    response.render("sellerCatalogue", {sellerID})
+                    response.render("sellerCatalogue", {sellerID, loggedIn: true})
                 } else {
-                    response.render("sellerCatalogue", {sellerID, sellerItems: res.rows})
+                    response.render("sellerCatalogue", {sellerID, sellerItems: res.rows, loggedIn: true})
                 }
             })
 
@@ -41,9 +41,9 @@ module.exports = (allModels) => {
                     console.log(err.message)
                     response.send("Error occurred.")
                 } else if(res.rows.length==0){
-                    response.render('catalogueForm', {sellerID})
+                    response.render('catalogueForm', {sellerID, loggedIn: true})
                 } else {
-                    response.render('catalogueForm', {sellerID, sellerItems: res.rows})
+                    response.render('catalogueForm', {sellerID, sellerItems: res.rows, loggedIn: true})
                 }
             })
         } else {
@@ -106,11 +106,12 @@ module.exports = (allModels) => {
     let renderSaleForm = (request, response)=>{
         if(sellerLoggedIn(request)) {
             //request from db a list of seller's items - use that to render options.
-            db_seller.getSellerItems(request.cookies['userID'], (err, res)=>{
+            db_seller.getSellerItems(request.cookies['userID'], null, (err, res)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
                 } else {
+                    res.loggedIn = true
                     response.render('saleform', res)
                 }
             })
@@ -123,21 +124,26 @@ module.exports = (allModels) => {
     let newSaleForm = (request, response) =>{
         let x = request.body
         let sellerID = x.seller_id
+        let sale_name = x.sale_name
+        let sale_desc = x.sale_desc
         if(sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
             let inputRows = []
             let datesLive =[]
             Object.keys(x).forEach((item)=>{
                 if(item.includes("qtyAv")){
-                    let itemKey = item.slice(5, item.length)
-                    let oneRow = [itemKey, x[item], x['maxOrd'+itemKey]]
-                    inputRows.push(oneRow)
-                    console.log(inputRows)
+                    if(x[item]>0){
+                        let itemKey = item.slice(5, item.length)
+                        let oneRow = [itemKey, x[item], x['maxOrd'+itemKey]]
+                        inputRows.push(oneRow)
+                        console.log(inputRows)
+                    }
+
                 } else if (item.includes("time_live")){
                     datesLive.push(x[item])
                 }
             })
 
-            db_seller.makeNewSales(sellerID, datesLive, inputRows, (err, isValid, success)=>{
+            db_seller.makeNewSales(sellerID, sale_name, sale_desc, datesLive, inputRows, (err, isValid, success)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
@@ -152,6 +158,71 @@ module.exports = (allModels) => {
         }
     }
 
+    let renderEditSaleForm = (request, response) =>{
+        if(sellerLoggedIn(request)){
+            let sellerID = request.cookies['userID']
+            let saleID = request.params.id
+            let seller_username = request.params.username
+            db_seller.renderEditSaleForm(sellerID, saleID, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else {
+                    let sellerInfo = {
+                        seller_username,
+                        loggedIn: true,
+                        sellerItems:res[0],
+                        saleInfo: res[1],
+                        saleItems: res[2]
+                    }
+                    response.render('editSaleForm', sellerInfo)
+                }
+
+            })
+
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
+
+    }
+
+    let updateSale = (request, response)=>{
+        let x = request.body
+        if(sellerLoggedIn(request)&&x.seller_id==request.cookies['userID']){
+            let inputRows = []
+            Object.keys(x).forEach((item)=>{
+                if(item.includes("qtyAv")){
+                    if(x[item]>0){
+                        let itemKey = item.slice(5, item.length)
+                        let oneRow = [itemKey, x[item], x['maxOrd'+itemKey]]
+                        inputRows.push(oneRow)
+                    }
+                }
+            })
+            //update sales table and sale_id table
+            let saleInfo = [x.time_live, x.sale_name, x.sale_desc, x.sale_id, x.seller_id]
+            db_seller.updateSaleInfo(inputRows, x.sale_id, x.seller_id, saleInfo, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else {
+                    response.redirect("/")
+                }
+            })
+        } else {
+            response.send("You do not have permission to perform this action.")
+        }
+
+
+
+
+    }
+
+    let deleteSale = (request, response) =>{
+
+    }
+
 
     return {
         sellerLoggedIn,
@@ -160,7 +231,10 @@ module.exports = (allModels) => {
         newCatalogueForm,
         deleteCatalogueForm,
         renderSaleForm,
-        newSaleForm
+        newSaleForm,
+        renderEditSaleForm,
+        updateSale,
+        deleteSale
     }
 
 }

@@ -1,10 +1,13 @@
 import React from 'react'
+import Head from './components/Head.jsx'
+import NavBar from './components/navBar.jsx'
 
 class SaleLivePage extends React.Component {
     render() {
         let allItems = this.props.items.rows
         let saleInfo = this.props.sale.rows[0]
         let sellerID = allItems[0].seller_id
+        let loggedIn = this.props.loggedIn
         let saleID = saleInfo.sale_id
         let postURL = "/seller/"+this.props.seller_username+"/sales/"+saleID+"/live"
         let now = new Date()
@@ -30,8 +33,9 @@ class SaleLivePage extends React.Component {
         if(now < Date.parse(saleInfo.time_live)){
             return (
                 <html>
-                    <head></head>
+                    <Head />
                     <body>
+                    <NavBar loggedIn={loggedIn}/>
                         <div>
                             <h1>Sale is on!!</h1>
                             <form method="POST" action={postURL}>
