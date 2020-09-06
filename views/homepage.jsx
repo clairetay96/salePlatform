@@ -27,7 +27,7 @@ class Homepage extends React.Component {
                                 <input type="submit"/>
                             </form>
                             <div className="signup-prompt">
-                                Don't have an account? <a href="/newacc">Sign up here.</a>
+                                Don't have an account? <a href="/user/new">Sign up here.</a>
                             </div>
                         </div>
                     </div>

@@ -16,24 +16,29 @@ class SaleForm extends React.Component {
         })
 
         return (
-            <div>
-                <form method="POST" action="/seller/sales/new/">
-                    {allItemsHTML}
-                    <br/><br/>
+            <html>
+                <head></head>
+                <body>
+                    <div>
+                        <form method="POST" action="/seller/sales/new/">
+                            {allItemsHTML}
+                            <br/><br/>
 
-                    <div id="livedates">
-                        <div className="liveDate">
-                            Date Live: <input type="datetime-local" name="time_live1"/>
-                        </div>
+                            <div id="livedates">
+                                <div className="liveDate">
+                                    Date Live: <input type="datetime-local" name="time_live1"/>
+                                </div>
+                            </div>
+
+                            <button type="button" id="addLiveDate">Add another date</button>
+                            <br/><br/>
+                            <input type="hidden" name="seller_id" value={sellerID}/>
+                            <input type="submit"/>
+                        </form>
+                        <script src="/newSale.js"></script>
                     </div>
-
-                    <button type="button" id="addLiveDate">Add another date</button>
-                    <br/><br/>
-                    <input type="hidden" name="seller_id" value={sellerID}/>
-                    <input type="submit"/>
-                </form>
-                <script src="/newSale.js"></script>
-            </div>
+                </body>
+            </html>
             )
     }
 }

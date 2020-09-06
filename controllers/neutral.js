@@ -22,7 +22,7 @@ module.exports = (allModels) => {
     let renderHome = (request, response) =>{
         if (loggedIn(request)) {
             if(request.cookies['role']=="sellers"){
-                db_seller.sellerInfoFromID(request.cookies['userID'], (err, sellerInfo)=>{
+                db_seller.sellerInfoFromID(request.cookies['userID'], (err, sellerInfo, placeholder)=>{
                     if(err){
                         console.log(err.message)
                         response.send("Error occurred.")
@@ -119,7 +119,6 @@ module.exports = (allModels) => {
             } else {
                 sellerInfo.isFollowing = isFollowing
                 sellerInfo.seller_username = seller_username
-                console.log(sellerInfo)
                 response.render('sellerPage', sellerInfo)
             }
         })

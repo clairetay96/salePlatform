@@ -6,10 +6,9 @@ class SignUp extends React.Component {
             <html>
                 <head>
                     <title>Hayaku: Signup</title>
-                    <link rel="stylesheet" type="text/css" href="/signup.css"/>
                 </head>
                 <body>
-                    <form method="POST" action="/newacc/">
+                    <form method="POST" action="/user/new/">
                         New Username: <input type="text" name="username"/> <br/><br/>
                         New Password: <input type="password" name="password"/> <br/><br/>
                         Role: <select name="role">

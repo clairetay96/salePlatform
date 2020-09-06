@@ -131,7 +131,8 @@ module.exports = (allModels) => {
         if(buyerLoggedIn(request)){
             let saleID = request.params.id
             let seller_username = request.params.username
-            db_seller.getSaleInfo(saleID, seller_username, (err, saleInfo, saleItems)=>{
+            let buyerID = request.cookies['userID']
+            db_seller.getSaleInfo(saleID, seller_username, buyerID, (err, saleInfo, saleItems)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")

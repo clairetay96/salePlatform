@@ -1,8 +1,19 @@
 module.exports = (dbPool) =>{
 
-    let postCatalogueForm = (inputRows, callback) => {
+    let deleteCatalogueItems = (sellerID, callback)=>{
+        let queryText = "DELETE FROM catalogue WHERE seller_id=$1"
+        dbPool.query(queryText, [sellerID])
+            .then((res)=>{callback(null, res)})
+            .catch((err)=>{callback(err, null)})
+    }
+
+    let postCatalogueForm = (newInputRows, editInputRows, callback) => {
+        let sellerID = newInputRows[0][4]
+        //should also check if item belongs to seller
+
         let queryText = "INSERT INTO catalogue(item_name, price, product_desc,image_url,seller_id) VALUES($1,$2,$3,$4,$5)"
-        inputRows.forEach((oneRow)=>{
+        newInputRows.forEach((oneRow)=>{
+            oneRow.pop()
             dbPool.query(queryText, oneRow, (err, res)=>{
                 if(err){
                     callback(err, null)
@@ -10,12 +21,32 @@ module.exports = (dbPool) =>{
                 }
             })
         })
+
+        let queryText1 ="UPDATE catalogue SET item_name=$1, price=$2, product_desc=$3,image_url=$4,seller_id=$5 WHERE item_id=$6"
+        editInputRows.forEach((oneRow)=>{
+            dbPool.query(queryText, oneRow, (err, res)=>{
+                if(err){
+                    callback(err, null)
+                    return
+                }
+            })
+        })
+
         callback(null, true)
     }
 
 
-    let getSellerItems = (seller_id, callback)=>{
+    let getSellerItems = (seller_id, address, callback)=>{
+        let digits = ['0','1','2','3','4','5','6','7','8','9']
         let queryText = "SELECT * FROM catalogue WHERE seller_id=$1"
+
+        if(address&&digits.includes(address[0])){
+            queryText += " AND item_id="+address
+
+        } else if (address&&address=="new") {
+            queryText += " AND 0=1"
+        }
+
         dbPool.query(queryText, [seller_id], (err, res)=>{
             callback(err, res)
         })
@@ -74,18 +105,19 @@ module.exports = (dbPool) =>{
             returnedValues.push(
                 dbPool.query(queryText, [seller_id])
                     .then(res=>res)
-                    .catch(err =>{callback(err, null)})
+                    .catch(err =>{callback(err, null,null)})
                 )
         })
 
         Promise.all(returnedValues)
-            .then(returnedValues => {
+            .then((returnedValues) => {
+                console.log(returnedValues)
                 let sellerInfo = {
                     catalogue: returnedValues[0],
                     sales: returnedValues[1],
                     followers: returnedValues[2]
                 }
-                callback(null, sellerInfo)
+                callback(null, sellerInfo, null)
             })
 
         return returnedValues
@@ -159,6 +191,7 @@ module.exports = (dbPool) =>{
     return {
         postCatalogueForm,
         getSellerItems,
+        deleteCatalogueItems,
         makeNewSales,
         sellerInfo,
         getSaleInfo,

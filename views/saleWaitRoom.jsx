@@ -21,18 +21,24 @@ class SaleWaitRoom extends React.Component {
         })
 
         return (
-            <div>
-                <LogoutButton />
-                {followSaleButton}
-                <h1>Waiting Room for Sale!</h1>
-                Items available:
-                <ul>
-                    {allItemsHTML}
-                </ul>
-                Button goes live at: <span id="date-req">{saleInfo.time_live}</span><br/>
-                <button id="liveSale">Click here to enter sale</button>
-                <script src="/saleWaitRoom.js"></script>
-            </div>
+            <html>
+                <head></head>
+                <body>
+                    <div>
+                        <LogoutButton />
+                        {followSaleButton}
+                        <h1>Waiting Room for Sale!</h1>
+                        Items available:
+                        <ul>
+                            {allItemsHTML}
+                        </ul>
+                        Button goes live at: <span id="date-req" className="livetime">{saleInfo.time_live}<span className="countdown"></span></span><br/>
+                        <button id="liveSale">Click here to enter sale</button>
+                        <script src="/saleWaitRoom.js"></script>
+                        <script src="/countdown.js"></script>
+                    </div>
+                </body>
+            </html>
             )
     }
 }

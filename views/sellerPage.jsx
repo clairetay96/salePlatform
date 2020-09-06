@@ -24,14 +24,22 @@ class SellerPage extends React.Component {
         })
 
         return (
-            <div>
-            {followButton}
-            Items:
-                {allItemsHTML}
-                <br/>
-            Sales:
-                {allSalesHTML}
-            </div>
+            <html>
+                <head>
+
+                </head>
+
+                <body>
+                    <div>
+                    {followButton}
+                    Items:
+                        {allItemsHTML}
+                        <br/>
+                    Sales:
+                        {allSalesHTML}
+                    </div>
+                </body>
+            </html>
             )
     }
 }

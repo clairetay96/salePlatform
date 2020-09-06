@@ -29,20 +29,25 @@ class SaleLivePage extends React.Component {
 
         if(now < Date.parse(saleInfo.time_live)){
             return (
-                <div>
-                    <h1>Sale is on!!</h1>
-                    <form method="POST" action={postURL}>
-                        {allItemsHTML}
-                        <br/><br/>
-                        <button type="button" id="confirm">Confirm order</button>
-                        <br/><br/>
-                        <input type="hidden" name="seller_id" value={sellerID}/>
-                        <input type="hidden" name="sale_id" value={saleID}/>
+                <html>
+                    <head></head>
+                    <body>
+                        <div>
+                            <h1>Sale is on!!</h1>
+                            <form method="POST" action={postURL}>
+                                {allItemsHTML}
+                                <br/><br/>
+                                <button type="button" id="confirm">Confirm order</button>
+                                <br/><br/>
+                                <input type="hidden" name="seller_id" value={sellerID}/>
+                                <input type="hidden" name="sale_id" value={saleID}/>
 
-                        <div id="confirmOrder"></div>
-                    </form>
-                    <script src="/liveSale.js"></script>
-                </div>
+                                <div id="confirmOrder"></div>
+                            </form>
+                            <script src="/liveSale.js"></script>
+                        </div>
+                    </body>
+                </html>
             )
 
         } else {

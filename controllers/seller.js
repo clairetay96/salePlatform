@@ -10,9 +10,42 @@ module.exports = (allModels) => {
         return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"
     }
 
+    let renderCatalogue = (request, response) =>{
+        if(sellerLoggedIn(request)){
+            let sellerID = request.cookies['userID']
+            db_seller.getSellerItems(sellerID, null, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if (res.rows.length==0){
+                    response.render("sellerCatalogue", {sellerID})
+                } else {
+                    response.render("sellerCatalogue", {sellerID, sellerItems: res.rows})
+                }
+            })
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
+    }
+
     let renderCatalogueForm = (request, response) =>{
         if (sellerLoggedIn(request)){
-            response.render('catalogueform', {seller_id: request.cookies['userID']})
+            let sellerID = request.cookies['userID']
+
+            let urlBreakdown = request.url.split("/")
+            let address = urlBreakdown.pop()
+
+            db_seller.getSellerItems(sellerID, address, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if(res.rows.length==0){
+                    response.render('catalogueForm', {sellerID})
+                } else {
+                    response.render('catalogueForm', {sellerID, sellerItems: res.rows})
+                }
+            })
         } else {
             response.send("You do not have permission to view this page.")
         }
@@ -24,15 +57,21 @@ module.exports = (allModels) => {
         let sellerID = x.seller_id
 
         if (sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
-            let allInput = []
+            let allNewInput = []
+            let allEditInput = []
             Object.keys(x).forEach((item)=>{
                 if(item.includes("item_name")){
                     let noKey = item.slice(9, item.length)
-                    let inputValues = [x[item], x['price'+noKey],x['product_desc'+noKey],x['imgURL'+noKey], sellerID]
-                    allInput.push(inputValues)
+                    let inputValues = [x[item], x['price'+noKey],x['product_desc'+noKey],x['imgURL'+noKey], sellerID, x['item_id'+noKey]]
+                    if(x['item_id'+noKey]){
+                        allEditInput.push(inputValues)
+                    } else {
+                        allNewInput.push(inputValues)
+                    }
                 }
             })
-            db_seller.postCatalogueForm(allInput, (err, success)=>{
+            console.log(allNewInput, allEditInput)
+            db_seller.postCatalogueForm(allNewInput, allEditInput,(err, success)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
@@ -43,6 +82,25 @@ module.exports = (allModels) => {
         } else {
             response.send("You do not have permission to add to catalogue.")
         }
+    }
+
+    let deleteCatalogueForm = (request, response)=> {
+        let x = request.body
+        let sellerID = x.seller_id
+        if(sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
+            db_seller.deleteCatalogueItems(sellerID, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else {
+                    response.redirect("/")
+                }
+            })
+        }
+    }
+
+    let deleteItem = (request, response)=>{
+        let x = request.body
     }
 
     let renderSaleForm = (request, response)=>{
@@ -95,15 +153,12 @@ module.exports = (allModels) => {
     }
 
 
-
-
-
-
-
     return {
         sellerLoggedIn,
+        renderCatalogue,
         renderCatalogueForm,
         newCatalogueForm,
+        deleteCatalogueForm,
         renderSaleForm,
         newSaleForm
     }
