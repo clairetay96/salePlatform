@@ -2,7 +2,6 @@ module.exports = (dbPool) =>{
 
     let newUser = (values, callback) =>{
         let queryText = "SELECT username FROM (SELECT username FROM sellers UNION ALL SELECT username FROM buyers) AS all_users WHERE username=$1"
-        console.log(queryText)
         dbPool.query(queryText, [values[0]], (err, res)=>{
             if(err){
                 console.log(err.message, "----ERROR MESSAGE")
