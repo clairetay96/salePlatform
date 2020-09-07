@@ -1,6 +1,6 @@
 let allDeadlines = document.querySelectorAll(".countdown")
 
-let countdownFunc =
+let username = document.querySelector("#username").innerText
 
 
 allDeadlines.forEach((element)=>{
@@ -37,8 +37,13 @@ let allClickedRows = document.querySelectorAll(".table-row-link")
 
 allClickedRows.forEach((item)=>{
     item.addEventListener("click", ()=>{
-        let orderID = item.querySelector(".order-ID").innerText
-        window.location = "/orders/"+orderID
+        if(item.querySelectorAll(".order-ID").length > 0){
+            let orderID = item.querySelector(".order-ID").innerText
+            window.location = "/orders/"+orderID
+        } else if (item.querySelectorAll(".sale-ID").length > 0) {
+            let saleID = item.querySelector(".sale-ID").innerText
+            window.location = "/seller/"+username+"/sales/"+saleID+"/orders/"
+        }
     })
 
 })

@@ -57,7 +57,7 @@ class SaleForm extends React.Component {
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div>
-                    <h2>Add a new sale</h2>
+                    <h2>Edit Sale</h2>
                         <form method="POST" action={actionURL}>
                             {allItemsTable}
                             <br/><br/>
@@ -75,7 +75,7 @@ class SaleForm extends React.Component {
                             <br/><br/>
                             <input type="hidden" name="seller_id" value={sellerID}/>
                             <input type="hidden" name="sale_id" value={saleInfo.sale_id}/>
-                            <input type="submit"/>
+                            <input type="submit" value="Edit Sale"/>
                         </form>
                         {deleteSale}
                     </div>

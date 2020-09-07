@@ -1,6 +1,5 @@
-.orders tr:not(:first-child):hover {
+.orders tr:not(:first-child):hover, .past-sales tr:not(:first-child):hover {
 	background-color: rgba(50,152,255);
 	color: white;
 	transition: 0.3s;
-
 }

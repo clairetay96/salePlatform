@@ -7,32 +7,31 @@ module.exports = (dbPool) =>{
             .catch((err)=>{callback(err, null)})
     }
 
-    let postCatalogueForm = (newInputRows, editInputRows, callback) => {
-        let sellerID = newInputRows[0][4]
+    let postCatalogueForm = (sellerID, newInputRows, editInputRows, callback) => {
         //should also check if item belongs to seller
+
+        let allQueries = []
 
         let queryText = "INSERT INTO catalogue(item_name, price, product_desc,image_url,seller_id) VALUES($1,$2,$3,$4,$5)"
         newInputRows.forEach((oneRow)=>{
-            oneRow.pop()
-            dbPool.query(queryText, oneRow, (err, res)=>{
-                if(err){
-                    callback(err, null)
-                    return
-                }
-            })
+            let newRow = oneRow.slice(0, 5)
+            allQueries.push(dbPool.query(queryText, newRow)
+                .then(res=>res)
+                .catch(err=>err))
         })
 
         let queryText1 ="UPDATE catalogue SET item_name=$1, price=$2, product_desc=$3,image_url=$4,seller_id=$5 WHERE item_id=$6"
         editInputRows.forEach((oneRow)=>{
-            dbPool.query(queryText, oneRow, (err, res)=>{
-                if(err){
-                    callback(err, null)
-                    return
-                }
-            })
+            allQueries.push(dbPool.query(queryText1, oneRow)
+                    .then(res=>res)
+                    .catch(err=>err))
         })
 
-        callback(null, true)
+        Promise.all(allQueries)
+            .then((res)=>{callback(null, true)})
+            .catch((err)=>{callback(err, null)})
+
+
     }
 
 
@@ -83,18 +82,23 @@ module.exports = (dbPool) =>{
                     if(err2){
                         callback(err2, null, null)
                         return
-                    }
-                    let tableName = "sales_"+res1.rows[0].sale_id
-                    inputRows.forEach((rowData)=>{
-                        let queryText3 = "INSERT INTO "+tableName+"(item_id, quantity,max_order) VALUES ($1,$2,$3)"
-                        dbPool.query(queryText3, rowData, (err3, res3)=>{
-                            if(err3){
-                                callback(err3, null, null)
-                            } else {
-                                callback(null,true,true)
-                            }
+                    } else {
+                        let allQueries = []
+                        let tableName = "sales_"+res1.rows[0].sale_id
+                        inputRows.forEach((rowData)=>{
+                            let queryText3 = "INSERT INTO "+tableName+"(item_id, quantity,max_order) VALUES ($1,$2,$3)"
+                            allQueries.push(
+                                dbPool.query(queryText3, rowData)
+                                    .then(res3=>res3)
+                                    .catch(err3=>err3)
+                            )
                         })
-                    })
+                         Promise.all(allQueries)
+                                .then(res=>{callback(null, true, true)})
+                                .catch(err=>{callback(err, null,null)})
+
+                    }
+
                 })
             })
         })
@@ -102,11 +106,16 @@ module.exports = (dbPool) =>{
 
     let sellerInfoFromID = (seller_id, callback) =>{
         let returnedValues = []
-        let tables = ['catalogue', 'sales', 'seller_tracker', 'sellers']
-        let seller_username;
+        let tables = ['catalogue', '(SELECT bar.sale_id, bar.seller_id, time_live, sale_name, tracker_count, count AS order_count FROM (SELECT sales.sale_id, seller_id, time_live, sale_name, count AS tracker_count FROM sales LEFT JOIN (SELECT sale_id, COUNT(buyer_id) FROM sale_tracker GROUP BY sale_id) AS foo ON sales.sale_id=foo.sale_id) AS bar LEFT JOIN (SELECT sale_id, COUNT(order_id) FROM orders GROUP BY sale_id) AS orderfoo ON orderfoo.sale_id=bar.sale_id) AS fubar', 'seller_tracker', 'sellers']
 
-        tables.forEach((table)=>{
+        tables.forEach((table, index)=>{
             let queryText = `SELECT * FROM ${table} WHERE seller_id=$1`
+            if(index==1){
+                queryText += " ORDER BY time_live DESC"
+            } else if(index==0){
+                queryText += " ORDER BY item_id"
+            }
+
             returnedValues.push(
                 dbPool.query(queryText, [seller_id])
                     .then(res=>res)
@@ -304,6 +313,22 @@ module.exports = (dbPool) =>{
 
     }
 
+    let getSaleOrderInfo = (sellerID, saleID, callback)=>{
+        let queryText = "SELECT * FROM sales WHERE seller_id=$1 AND sale_id=$2"
+        dbPool.query(queryText, [sellerID, saleID])
+            .then((res)=>{
+                if(res.rowCount==0){
+                    callback(null, false, null)
+                } else {
+                    let queryText1 = "SELECT order_id, sale_id, buyer_id, timestamp, username, bar.item_id, quantity, amt_charged, item_name FROM (SELECT foo.order_id, sale_id,buyer_id, timestamp, username, item_id, quantity, amt_charged FROM (SELECT order_id, sale_id, orders.buyer_id, timestamp, username FROM orders INNER JOIN buyers ON orders.buyer_id=buyers.buyer_id) AS foo INNER JOIN order_details ON foo.order_id=order_details.order_id) AS bar INNER JOIN catalogue ON bar.item_id=catalogue.item_id WHERE sale_id=$1 ORDER BY order_id ASC"
+                    dbPool.query(queryText1, [saleID])
+                        .then((res)=>{callback(null,true,res)})
+                        .catch((err)=>{callback(err, null, null)})
+                }
+            })
+            .catch((err)=>{callback(err, null,null)})
+    }
+
 
 
     return {
@@ -317,7 +342,8 @@ module.exports = (dbPool) =>{
         renderEditSaleForm,
         updateSaleInfo,
         closeSaleUpdate,
-        deleteSale
+        deleteSale,
+        getSaleOrderInfo
 
     }
 }

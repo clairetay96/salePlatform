@@ -11,7 +11,14 @@ class SellerHomepage extends React.Component {
         let seller_username = this.props.username
 
         let catalogueItemsHTML = catalogueItems.map((item)=>{
-            return <li className="list-inline-item">{item.item_name}</li>
+            let editURL = "/seller/catalogue/edit/"+item.item_id
+            return (
+                <div>
+                    <img src={item.image_url}/>
+                    <h5>{item.item_name}</h5>
+                    <a href={editURL}>Edit</a>
+                    <p>{item.product_desc}</p>
+                </div>)
         })
 
         let upcomingsales = []
@@ -26,16 +33,16 @@ class SellerHomepage extends React.Component {
         })
 
         let pastSalesHTML = pastsales.map((item)=>{
-            return (<tr>
+            return (<tr className="table-row-link">
                 <td>{item.sale_name}</td>
-                <td>{item.sale_id}</td>
-                <td>{item.time_live.slice(0,10)}</td>
-                <td>follow</td>
+                <td className="sale-ID">{item.sale_id}</td>
+                <td>{item.time_live.slice(0,10)+" "+item.time_live.slice(11,16)}</td>
+                <td>{item.order_count}</td>
                 </tr>)
         })
 
         let pastSalesTable = (
-            <table>
+            <table className="past-sales">
             <tr>
                 <th>Sale Name</th>
                 <th>ID</th>
@@ -48,19 +55,21 @@ class SellerHomepage extends React.Component {
 
         let upcomingSalesHTML = upcomingsales.map((item)=>{
             return (<tr>
+                <td>{item.sale_name}</td>
                 <td>{item.sale_id}</td>
                 <td>{item.time_live}</td>
+                <td>{item.tracker_count}</td>
                 <td><a href={`/seller/${seller_username}/sales/${item.sale_id}/edit`}>Edit</a></td>
                 </tr>)
         })
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/buyerhp.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                 <div class="welcome-header">
-                    <h1>Welcome, {seller_username}</h1>
+                    <h1>Welcome, <span id="username">{seller_username}</span>.</h1>
                     <p>Follower count: {followerNo}</p>
                 </div>
                 <div className="row">
@@ -72,8 +81,11 @@ class SellerHomepage extends React.Component {
                         </div>
                         <table>
                         <tr>
-                            <th>Sale ID</th>
+                            <th>Sale Name</th>
+                            <th>ID</th>
                             <th>Drop Date</th>
+                            <th>Trackers</th>
+                            <th>edit</th>
                             <th></th>
                         </tr>
                         {upcomingSalesHTML}
@@ -93,14 +105,12 @@ class SellerHomepage extends React.Component {
                             <h3>Catalogue</h3>
                             <a href="/seller/catalogue/edit/">Edit your catalogue</a>
                         </div>
-                        <ul className="list-inline">
                             {catalogueItemsHTML}
-                        </ul>
                     </div>
                 </div>
 
 
-
+                    <script src="/countdown.js"></script>
                 </body>
             </html>)
     }

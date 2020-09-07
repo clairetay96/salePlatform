@@ -72,7 +72,7 @@ module.exports = (allModels) => {
                 }
             })
             console.log(allNewInput, allEditInput)
-            db_seller.postCatalogueForm(allNewInput, allEditInput,(err, success)=>{
+            db_seller.postCatalogueForm(sellerID, allNewInput, allEditInput,(err, success)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
@@ -258,6 +258,25 @@ module.exports = (allModels) => {
     }
 
     let getSaleOrders = (request, response) =>{
+        if(sellerLoggedIn){
+            let sellerID = request.cookies['userID']
+            let saleID = request.params.saleid
+            db_seller.getSaleOrderInfo(sellerID, saleID, (err, isValid, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occured.")
+                } else if (!isValid) {
+                    response.send("You do not have permission to view this page.")
+                } else if(res) {
+                    res.loggedIn = true
+                    response.render('saleOrderPage', res)
+                }
+
+            })
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
 
     }
 

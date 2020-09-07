@@ -24,7 +24,10 @@ module.exports = (allModels) => {
                 if(item.includes("item")){
                     let noKey = item.slice(4, item.length)
                     let values = [noKey, x[item], parseInt(x['price'+noKey])*x[item]] //contains item_id and quantity
-                    queries.push(values)
+                    if(x[item]>0){
+                        queries.push(values)
+                    }
+
                 }
             })
 
