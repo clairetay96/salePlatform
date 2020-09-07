@@ -3,7 +3,8 @@ CREATE TABLE IF NOT EXISTS sellers (
 	username TEXT,
 	password TEXT,
 	details TEXT,
-	role TEXT);
+	role TEXT,
+	seller_desc TEXT);
 
 CREATE TABLE IF NOT EXISTS buyers (
 	buyer_id SERIAL PRIMARY KEY,
