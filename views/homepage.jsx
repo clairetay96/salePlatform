@@ -8,18 +8,18 @@ class Homepage extends React.Component {
             <html>
                 <Head additionalStyle={{otherScripts: ["/homepage.css"]}}/>
                 <body>
-                    <div className="row">
+                    <div className="row homepage ">
                         <div className="col-md-6 logo">
                         <h1>Hayaku!</h1>
                         <p>The one-stop solution to limited edition product drops, for sellers and product enthusiasts.</p>
                         </div>
 
                         <div className="col-md-6 login">
-                            <div className="col-md-10 login-items">
+                            <div className="col-md-8 login-items">
                                 <form method="POST" action="/login">
-                                    <input type="text" name="username" placeholder="Username"/>
-                                    <input type="password" name="password" placeholder="Password"/>
-                                    <select name="role">
+                                    <input type="text" name="username" placeholder="Username" required/>
+                                    <input type="password" name="password" placeholder="Password" required/>
+                                    <select name="role" required>
                                     <option disabled selected value>  --Role--  </option>
                                         <option value="buyers">Buyer</option>
                                         <option value="sellers">Seller</option>

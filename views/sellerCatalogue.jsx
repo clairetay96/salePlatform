@@ -20,12 +20,14 @@ class SellerCatalogue extends React.Component {
                     <div>
 
                         <h1>Your Catalogue</h1>
-                         <div>
-                            <a href="new">Add a new item</a>
+                        <div className="row">
+                            <div className="col-md-3">
+                                <a href="new">Add new items</a>
                             </div>
-                            <div>
-                            <a href="all">Edit all items</a>
+                            <div className="col-md-3 offset-md-1">
+                                <a href="all">Edit all items</a>
                             </div>
+                        </div>
                             <div className="allItems">
                             <h3>Your items</h3>
                                 {allItemsHTML}

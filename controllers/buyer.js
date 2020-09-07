@@ -33,7 +33,7 @@ module.exports = (allModels) => {
                     console.log(err.message)
                     response.send("Error occurred.")
                 } else if (orderID&&soldOut.length==0) {
-                    response.send("Order successful. Your order id is "+ orderID)
+                    response.send("Order successful. Your order id is "+ orderID +". <a href='/'>Back to homepage.</a>")
                 } else if (orderID&&soldOut.length > 0){
                     response.send(soldOut[0])
                 } else if (!orderID){
@@ -139,7 +139,7 @@ module.exports = (allModels) => {
                 } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
                     response.send("This sale does not exist - did you get the username/sale ID right?")
                 }else {
-                    response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username})
+                    response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username, loggedIn: true})
                 }
             })
         } else {

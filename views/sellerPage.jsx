@@ -29,16 +29,22 @@ class SellerPage extends React.Component {
         return (
             <html>
                 <Head />
-                <NavBar loggedIn={loggedIn}/>
 
                 <body>
-                    <div>
-                    {followButton}
-                    Items:
-                        {allItemsHTML}
-                        <br/>
-                    Sales:
-                        {allSalesHTML}
+                    <NavBar loggedIn={loggedIn}/>
+                    <div className="card-headers">
+                        <h1>{seller_username}</h1>
+                            {followButton}
+                    </div>
+                    <div className="row">
+                        <div className="col-md-5 offset-md-1">
+                        <h3>Catalogue</h3>
+                            {allItemsHTML}
+                        </div>
+                        <div className="col-md-5">
+                        <h3>Upcoming Sales</h3>
+                            {allSalesHTML}
+                        </div>
                     </div>
                 </body>
             </html>

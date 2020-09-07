@@ -11,16 +11,25 @@ class SaleForm extends React.Component {
         let saleItems = this.props.saleItems.rows
         let loggedIn = this.props.loggedIn
         let actionURL = `/seller/${this.props.seller_username}/sales/${saleInfo.sale_id}/edit?_method=PUT`
+        let deleteURL = `/seller/${this.props.seller_username}/sales/${saleInfo.sale_id}/delete?_method=DELETE`
 
-        let saleItemsID = sellerItems.map(item=>item.item_id)
+        let saleItemsID = saleItems.map(item=>item.item_id)
 
         let allItemsHTML = sellerItems.map((item)=>{
             let qtyAvName = "qtyAv" + item.item_id
             let maxOrdName = "maxOrd" + item.item_id
             let defaultQtyVal = 0
             let defaultMaxOrd = 0
+            console.log(sellerItems, saleItems, saleItemsID)
 
-            if(saleItemsID.includes(item.item_id))
+            if(saleItemsID.includes(item.item_id)){
+                for(let i=0;i<saleItemsID.length;i++){
+                    if(saleItems[i].item_id==item.item_id){
+                        defaultQtyVal=saleItems[i].quantity
+                        defaultMaxOrd=saleItems[i].max_order
+                    }
+                }
+            }
 
             return (<tr className="saleItem">
                         <td>{item.item_name}</td>
@@ -29,6 +38,8 @@ class SaleForm extends React.Component {
                         <td><input type="number" name={maxOrdName} min="0" defaultValue={defaultMaxOrd}/></td>
                     </tr>)
         })
+
+        let deleteSale = <form method="POST" action={deleteURL}><input type="submit" value="Delete Sale"/></form>
 
         let allItemsTable = (<table>
             <tr>
@@ -52,9 +63,9 @@ class SaleForm extends React.Component {
                             <br/><br/>
 
                             Sale name<br/>
-                            <input type="text" name="sale_name"/><br/>
+                            <input type="text" name="sale_name" defaultValue={saleInfo.sale_name}/><br/>
                             Sale description<br/>
-                            <textarea name="sale_desc"/>
+                            <textarea name="sale_desc" defaultValue={saleInfo.sale_desc}/>
 
                             <div id="livedates">
                                 <div className="liveDate">
@@ -66,6 +77,7 @@ class SaleForm extends React.Component {
                             <input type="hidden" name="sale_id" value={saleInfo.sale_id}/>
                             <input type="submit"/>
                         </form>
+                        {deleteSale}
                     </div>
                 </body>
             </html>

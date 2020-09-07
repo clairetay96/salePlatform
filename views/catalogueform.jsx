@@ -6,8 +6,21 @@ import NavBar from './components/navBar.jsx'
 class CatalogueForm extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
+        let addDel = this.props.addDel
+        console.log(this.props)
+
+        let deleteButton;
+        let addButton;
+
+        if(addDel&&addDel.del){
+            deleteButton = (<button type="button" className="removeItemBtn">Delete Item</button>)
+        }
+        if (addDel&&addDel.add){
+            addButton = (<button type="button" id="addItemBtn">Add another item</button>)
+        }
 
         let allItemsHTML = <CatalogueItemInput />
+
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
                 return (<div className="itemInput">
@@ -15,8 +28,9 @@ class CatalogueForm extends React.Component {
               Price: <input type="text" name={"price"+i} autoComplete="off" defaultValue={item.price}/><br/><br/>
               Description: <input type="text" name={"product_desc"+i} autoComplete="off" defaultValue={item.product_desc}/><br/><br/>
               Image URL: <input type="text" name={"imgURL"+i} autoComplete="off" defaultValue={item.image_url}/><br/><br/>
+              {deleteButton}
               <input type="hidden" name={"item_id"+i} value={item.item_id}/>
-              <button type="button" className="removeItemBtn">Delete Item</button><br/><br/>
+              <br/><br/>
             </div>)
             })
 
@@ -33,8 +47,7 @@ class CatalogueForm extends React.Component {
                                 {allItemsHTML}
                             </div>
 
-                            <button type="button" id="addItemBtn">Add another item</button>
-                            <br/><br/>
+                            {addButton}
 
                             <input type="hidden" name="seller_id" value={this.props.sellerID}/>
 

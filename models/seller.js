@@ -39,16 +39,20 @@ module.exports = (dbPool) =>{
     let getSellerItems = (seller_id, address, callback)=>{
         let digits = ['0','1','2','3','4','5','6','7','8','9']
         let queryText = "SELECT * FROM catalogue WHERE seller_id=$1"
+        let canAddAndDel = {add: true, del: false}
+        console.log(address, "---address")
 
         if(address&&digits.includes(address[0])){
             queryText += " AND item_id="+address
+            canAddAndDel={add: false, del: false}
 
         } else if (address&&address=="new") {
             queryText += " AND 0=1"
+            canAddAndDel = {add: true, del: true}
         }
 
         dbPool.query(queryText, [seller_id], (err, res)=>{
-            callback(err, res)
+            callback(err, res, canAddAndDel)
         })
     }
 
@@ -202,8 +206,9 @@ module.exports = (dbPool) =>{
             .then(res=>res)
             .catch(err=>callback(err, null)))
 
-        let queryText2 = `SELECT * FROM sales_${saleID}`
-        allQueries.push(dbPool.query(queryText1, [saleID])
+        let table = 'sales_'+ saleID
+        let queryText2 = `SELECT * FROM `+table
+        allQueries.push(dbPool.query(queryText2)
             .then(res=>res)
             .catch(err=>{callback(err, null)}))
 
@@ -214,35 +219,90 @@ module.exports = (dbPool) =>{
     }
 
     let updateSaleInfo = (inputRows,saleID,sellerID,saleInfo,callback)=>{
-        let allQueries = []
 
-        let queryText = "UPDATE sales SET time_live=$1, sale_name=$2, sale_desc=$3 WHERE sale_id=$4 AND seller_id=$5"
-        allQueries.push(dbPool.query(queryText, saleInfo)
-                .then(res=>res)
-                .catch(err=>callback(err, null)))
 
-        let table = "sales_"+saleID
-        let queryText1 = `DELETE FROM ${table}`
-        dbPool.query(queryText1)
-            .then(res=>{
-                inputRows.forEach((item)=>{
-                    let queryText2 =`INSERT INTO ${table} (item_id, quantity,max_order) VALUES ($1,$2,$3)`
-                    allQueries.push(dbPool.query(queryText2, item)
-                                        .then(res=>res)
-                                        .catch(err=>{callback(err, null)}))
-        })
+        let queryText3 = "SELECT time_live FROM sales WHERE sale_id=$1 AND seller_id=$2"
+        dbPool.query(queryText3, [saleID, sellerID])
+            .then(res => {
+                let time_live = res.rows[0].time_live
+                let now = new Date()
+                if(now >= Date.parse(time_live)){
+                    callback(null, true, null)
+                } else {
+                    let allQueries = []
+                    let queryText = "UPDATE sales SET time_live=$1, sale_name=$2, sale_desc=$3 WHERE sale_id=$4 AND seller_id=$5"
+                    allQueries.push(dbPool.query(queryText, saleInfo)
+                            .then(res=>res)
+                            .catch(err=>callback(err, null,null)))
 
+                    let table = "sales_"+saleID
+                    let queryText1 = `DELETE FROM ${table}`
+                    dbPool.query(queryText1)
+                        .then(res=>{
+                            inputRows.forEach((item)=>{
+                                let queryText2 =`INSERT INTO ${table} (item_id, quantity,max_order) VALUES ($1,$2,$3)`
+                                allQueries.push(dbPool.query(queryText2, item)
+                                                    .then(res=>res)
+                                                    .catch(err=>{callback(err, null, null)}))
+                    })
+
+                        })
+                        .catch(err=>{callback(err, null, null)})
+
+
+
+                    Promise.all(allQueries)
+                        .then(res=>{callback(null, null, res)})
+                        .catch(err=>{callback(err, null, null)})
+
+                }
             })
-            .catch(err=>{callback(err, null)})
+            .catch(err=>{callback(err, null, null)})
 
-
-
-        Promise.all(allQueries)
-            .then(res=>{callback(null, res)})
-            .catch(err=>{callback(err, null)})
 
     }
 
+    let closeSaleUpdate = (sellerID, saleID, callback)=>{
+
+        let queryText="UPDATE sales SET sold_out='true' WHERE sale_id=$1 AND seller_id=$2"
+
+
+        let queryText1 = "DROP TABLE sales_"+saleID
+
+    }
+
+    let deleteSale = (sellerID, saleID, callback)=>{
+        let queryText = "SELECT time_live FROM sales WHERE seller_id=$1 AND sale_id=$2"
+        dbPool.query(queryText, [sellerID, saleID])
+            .then(res=>{
+                let time_live = res.rows[0].time_live
+                let now = new Date()
+                if(now >= time_live){
+                    callback(null, true, null)
+                } else {
+                    let allQueries = []
+                    let table = "sales_"+saleID
+                    let queryText1=`DROP TABLE ${table}`
+                    allQueries.push(
+                        dbPool.query(queryText1)
+                            .then(res=>res)
+                            .catch(err=>{callback(err, null,null)}))
+                    let queryText2 = `DELETE FROM sales WHERE seller_id=$1 AND sale_id=$2`
+                    allQueries.push(
+                        dbPool.query(queryText2, [sellerID, saleID])
+                            .then(res=>res)
+                            .catch(err=>{callback(err, null,null)}))
+                    Promise.all(allQueries)
+                    .then(res=>{callback(null,null,true)})
+                    .catch(err=>{callback(err, null,null)})
+
+
+                }
+
+            })
+            .catch(err=>{callback(err, null, null)})
+
+    }
 
 
 
@@ -255,7 +315,9 @@ module.exports = (dbPool) =>{
         getSaleInfo,
         sellerInfoFromID,
         renderEditSaleForm,
-        updateSaleInfo
+        updateSaleInfo,
+        closeSaleUpdate,
+        deleteSale
 
     }
 }

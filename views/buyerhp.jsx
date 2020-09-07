@@ -23,10 +23,24 @@ class Homepage extends React.Component {
 
 
         let ordersData = buyersOrders.map((item)=>{
-            return <tr><td>{item.order_id}</td></tr>
+            return (
+                <tr>
+                    <td>{item.sale_id}</td>
+                    <td>Seller name</td>
+                    <td>{item.order_id}</td>
+                    <td>Drop Date</td>
+                </tr>)
         })
 
-        let ordersHTML = <table><tr><th>Order ID</th></tr>{ordersData}</table>
+        let ordersHTML = (
+            <table>
+                <tr>
+                    <th>Sale</th>
+                    <th>Seller</th>
+                    <th>Order ID</th>
+                    <th>Drop Date</th>
+                </tr>{ordersData}
+            </table>)
 
         return (
             <html>
@@ -35,17 +49,17 @@ class Homepage extends React.Component {
                 <NavBar loggedIn={loggedIn}/>
                 <h1>Welcome, {buyerUsername}.</h1>
                 <div className="row">
-                    <div className="col-md-5">
+                    <div className="col-md-5 offset-md-1">
                         <h4>Tracked Drops</h4>
                         {trackedSaleHTML}
                     </div>
                     <div className="col-md-5">
                         <div>
-                            <h4>Tracked Sellers:</h4>
+                            <h4>Tracked Sellers</h4>
                                 {trackedSellerHTML}
                         </div>
                         <div>
-                            <h4>Order History:</h4>
+                            <h4>Transaction History</h4>
                                 {ordersHTML}
                         </div>
                     </div>

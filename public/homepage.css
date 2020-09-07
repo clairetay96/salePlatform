@@ -1,12 +1,19 @@
+.homepage {
+	height: 100vh;
+}
+
 .login, .logo {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	justify-content: center;
 	padding: 20px 20px;
 }
 
 .logo {
 	padding: 50px;
+	background-image: linear-gradient(to right,rgba(146,152,255), rgba(50,152,255), rgba(0,219,230));
+	color: white;
 }
 
 .login-items {
@@ -14,19 +21,26 @@
 	flex-direction: column;
 	align-items: center;
 	justify-content: center;
-	padding: 20px;
+	padding: 15px 0;
 	text-align: center;
+	background-color: rgba(0,219,230,0.13);
 }
 
 .signup {
-	color: blue;
-	border: 1px solid blue;
+	color: rgba(50,152,255);
+	border: 1px solid rgba(50,152,255);
 	background-color: rgba(0,0,0,0)
+}
+
+.signup:hover{
+	background-color: rgba(50,152,255);
+	color: white;
+	transition: 0.3s;
 }
 
 input[type="submit"]{
 	border: none;
-	background-color: blue;
+	background-color: rgba(50,152,255);
 	color: white;
 }
 
@@ -36,7 +50,7 @@ form {
 	align-items: center;
 }
 
-.login > div *{
+.login-items *{
 	margin: 5px 0;
 	width: 80%;
 	padding: 3px;

@@ -13,7 +13,7 @@ module.exports = (allModels) => {
     let renderCatalogue = (request, response) =>{
         if(sellerLoggedIn(request)){
             let sellerID = request.cookies['userID']
-            db_seller.getSellerItems(sellerID, null, (err, res)=>{
+            db_seller.getSellerItems(sellerID, null, (err, res, placeholder)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
@@ -31,19 +31,20 @@ module.exports = (allModels) => {
 
     let renderCatalogueForm = (request, response) =>{
         if (sellerLoggedIn(request)){
+            let digits
             let sellerID = request.cookies['userID']
 
             let urlBreakdown = request.url.split("/")
             let address = urlBreakdown.pop()
 
-            db_seller.getSellerItems(sellerID, address, (err, res)=>{
+            db_seller.getSellerItems(sellerID, address, (err, res, canAddAndDel)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
                 } else if(res.rows.length==0){
-                    response.render('catalogueForm', {sellerID, loggedIn: true})
+                    response.render('catalogueForm', {sellerID, loggedIn: true, addDel: canAddAndDel})
                 } else {
-                    response.render('catalogueForm', {sellerID, sellerItems: res.rows, loggedIn: true})
+                    response.render('catalogueForm', {sellerID, sellerItems: res.rows, loggedIn: true, addDel: canAddAndDel})
                 }
             })
         } else {
@@ -106,7 +107,7 @@ module.exports = (allModels) => {
     let renderSaleForm = (request, response)=>{
         if(sellerLoggedIn(request)) {
             //request from db a list of seller's items - use that to render options.
-            db_seller.getSellerItems(request.cookies['userID'], null, (err, res)=>{
+            db_seller.getSellerItems(request.cookies['userID'], null, (err, res, placeholder)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
@@ -202,10 +203,12 @@ module.exports = (allModels) => {
             })
             //update sales table and sale_id table
             let saleInfo = [x.time_live, x.sale_name, x.sale_desc, x.sale_id, x.seller_id]
-            db_seller.updateSaleInfo(inputRows, x.sale_id, x.seller_id, saleInfo, (err, res)=>{
+            db_seller.updateSaleInfo(inputRows, x.sale_id, x.seller_id, saleInfo, (err, cannotUpdate,res)=>{
                 if(err){
                     console.log(err.message)
                     response.send("Error occurred.")
+                }else if(cannotUpdate) {
+                    response.send("You cannot update a sale once it has gone live.")
                 } else {
                     response.redirect("/")
                 }
@@ -213,13 +216,44 @@ module.exports = (allModels) => {
         } else {
             response.send("You do not have permission to perform this action.")
         }
-
-
-
-
     }
 
-    let deleteSale = (request, response) =>{
+    //can only delete sale before it goes live = otherwise you have to close it.
+    let deleteSale = (request, response) => {
+        if(sellerLoggedIn(request)){
+            let sellerID = request.cookies['userID']
+            let saleID = request.params.id
+            db_seller.deleteSale(sellerID,saleID, (err, cannotDelete, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                }else if(cannotDelete){
+                    response.send("You can only delete a sale that hasn't occurred yet. If the sale has gone live, you can close it.")
+                } else {
+                    response.redirect("/")
+                }
+            })
+
+
+
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
+    }
+
+    let closeSale = (request, response) =>{
+        if(sellerLoggedIn(request)){
+            let sellerID = request.cookies['userID']
+            let saleID = request.params.id
+            //must close sale and drop table, but will not remove orders from that sale.
+            db_seller.closeSaleUpdate(sellerID, saleID, (err, isValid, res)=>{
+
+            })
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
 
     }
 
@@ -234,6 +268,7 @@ module.exports = (allModels) => {
         newSaleForm,
         renderEditSaleForm,
         updateSale,
+        closeSale,
         deleteSale
     }
 

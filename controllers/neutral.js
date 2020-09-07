@@ -39,6 +39,7 @@ module.exports = (allModels) => {
                         response.send("Error occurred.")
                     } else {
                         userInfo.loggedIn = true
+                        console.log(userInfo.sellers_tracked)
                         response.render('buyerhp', userInfo)
                     }
                 })
@@ -121,7 +122,7 @@ module.exports = (allModels) => {
             } else {
                 sellerInfo.isFollowing = isFollowing
                 sellerInfo.seller_username = seller_username
-                sellerInfo.loggedIn = true
+                sellerInfo.loggedIn = loggedIn(request) ? true : false
                 response.render('sellerPage', sellerInfo)
             }
         })

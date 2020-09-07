@@ -35,10 +35,13 @@ class SaleWaitRoom extends React.Component {
                         <ul>
                             {allItemsHTML}
                         </ul>
-                        Button goes live at: <span id="date-req" className="livetime">{saleInfo.time_live}<span className="countdown"></span></span><br/>
+                        Button goes live at: <span id="date-req" className="livetime">{saleInfo.time_live}</span>
+
+                        <div className="countdown"></div><br/>
+
+
                         <button id="liveSale">Click here to enter sale</button>
                         <script src="/saleWaitRoom.js"></script>
-                        <script src="/countdown.js"></script>
                     </div>
                 </body>
             </html>

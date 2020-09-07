@@ -2,6 +2,7 @@ let confirmButton = document.querySelector("#confirm")
 let confirmDiv = document.querySelector("#confirmOrder")
 
 confirmButton.addEventListener("click", ()=>{
+    let sumTotal = 0
 
     confirmDiv.innerHTML = ""
     let tallyTable = document.createElement("table")
@@ -20,14 +21,29 @@ confirmButton.addEventListener("click", ()=>{
 
     allItems.forEach((element)=>{
         let row = document.createElement("tr")
-        let values = [element.querySelector(".itemName").innerText, element.querySelector(".orderqty").value, (element.querySelector(".itemPrice").innerText*element.querySelector(".orderqty").value).toFixed(2)]
-        values.forEach((item)=>{
-            let cell = document.createElement("td")
-            cell.innerText = item
-            row.appendChild(cell)
-        })
-        tallyTable.appendChild(row)
+        let itemName = element.querySelector(".itemName").innerText
+        let itemQty = element.querySelector(".orderqty").value
+        let itemPrice = element.querySelector(".itemPrice").innerText
+        itemPrice = parseFloat(itemPrice.slice(1, itemPrice.length))
+        let itemCost = (itemPrice*itemQty).toFixed(2)
+        sumTotal += parseFloat(itemCost)
+
+        if (itemQty>0){
+            let values = [itemName, itemQty, itemCost]
+            values.forEach((item)=>{
+                let cell = document.createElement("td")
+                cell.innerText = item
+                row.appendChild(cell)
+            })
+            tallyTable.appendChild(row)
+
+        }
+
     })
+
+    let sumTotalRow = document.createElement("tr")
+    sumTotalRow.innerHTML = `<td></td><td>Total</td><td>${sumTotal.toFixed(2)}</td>`
+    tallyTable.appendChild(sumTotalRow)
 
     confirmDiv.appendChild(tallyTable)
 

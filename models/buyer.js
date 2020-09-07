@@ -8,7 +8,7 @@ module.exports = (dbPool) =>{
         let failedQueries = [] //promises
         let successQueries = [] //promises
         let allQueries = [] //promises
-        //run each query
+        //run each query - if there are enough to meet order qty, purchase is successful and made. Otherwise, it's not.
         queries.forEach((query)=>{
             let queryText0 = `SELECT * FROM sales_${saleID} WHERE item_id=$1 AND quantity >=${query[1]}`
             allQueries.push(
@@ -41,27 +41,29 @@ module.exports = (dbPool) =>{
                     Promise.all(successQueries)
                     .then((successQueries)=>{
                         if(successQueries.length>0){
+
                             let queryText1 = "INSERT INTO orders(seller_id, sale_id, buyer_id) VALUES($1,$2,$3) RETURNING order_id"
-                            let orderID;
                             dbPool.query(queryText1, [sellerID, saleID, buyerID], (err1, res1)=>{
                                 if(err1){
                                     callback(err1, null, null)
-                                    return
                                 } else {
-                                    orderID = res1.rows[0].order_id
+                                    let orderID = res1.rows[0].order_id
+                                    let orderDetailPromises = []
+
                                     successQueries.forEach((query)=>{
                                         let queryText2 = "INSERT INTO order_details(order_id, item_id, quantity, amt_charged) VALUES($1,$2,$3,$4)"
 
                                         let totalQuery = [orderID].concat(query)
 
-                                        dbPool.query(queryText2, totalQuery, (err2,res2)=>{
-                                            if(err2){
-                                                callback(err2, null, null)
-                                                return
-                                            }
-                                        })
+                                        orderDetailPromises.push(
+                                            dbPool.query(queryText2, totalQuery)
+                                            .then(res=>res)
+                                            .catch(err=>err))
+
+                                        Promise.all(orderDetailPromises)
+                                            .then((res)=>callback(null, orderID, failedQueries))
+                                            .catch((err)=>callback(err, null, null))
                                     })
-                                    callback(null, orderID, failedQueries)
                                 }
                             })
                         } else {
