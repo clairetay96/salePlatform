@@ -257,6 +257,10 @@ module.exports = (allModels) => {
 
     }
 
+    let getSaleOrders = (request, response) =>{
+
+    }
+
 
     return {
         sellerLoggedIn,
@@ -269,7 +273,8 @@ module.exports = (allModels) => {
         renderEditSaleForm,
         updateSale,
         closeSale,
-        deleteSale
+        deleteSale,
+        getSaleOrders
     }
 
 }

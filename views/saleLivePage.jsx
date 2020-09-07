@@ -26,8 +26,8 @@ class SaleLivePage extends React.Component {
             } else {
                 return (
                     <tr className="saleItem">
-                        <td className="itemName">{item.item_name}<span>SOLD OUT</span></td>,
-                        $<td className="itemPrice">{item.price}</td>.
+                        <td className="itemName">{item.item_name}<span>SOLD OUT</span></td>
+                        <td className="itemPrice">${item.price}</td>
                         <td></td>
                     </tr>)
             }

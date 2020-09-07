@@ -17,13 +17,8 @@ class Homepage extends React.Component {
                         <div className="col-md-6 login">
                             <div className="col-md-8 login-items">
                                 <form method="POST" action="/login">
-                                    <input type="text" name="username" placeholder="Username" required/>
+                                    <input type="text" name="username" placeholder="Username" autocomplete="off" required/>
                                     <input type="password" name="password" placeholder="Password" required/>
-                                    <select name="role" required>
-                                    <option disabled selected value>  --Role--  </option>
-                                        <option value="buyers">Buyer</option>
-                                        <option value="sellers">Seller</option>
-                                        </select>
                                     <input type="submit" value="Log In"/>
                                 </form>
                                 <a href="/user/new"><button className="signup">Sign Up</button></a>

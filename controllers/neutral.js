@@ -39,7 +39,6 @@ module.exports = (allModels) => {
                         response.send("Error occurred.")
                     } else {
                         userInfo.loggedIn = true
-                        console.log(userInfo.sellers_tracked)
                         response.render('buyerhp', userInfo)
                     }
                 })
@@ -51,20 +50,19 @@ module.exports = (allModels) => {
 
     let logIn = (request, response) =>{
         x = request.body
-        values = [x.username, sha256(x.password), x.role]
+        values = [x.username, sha256(x.password)]
         db_neutral.logInVerify(values, (err, res, usernameExists, logInSuccess)=>{
             if(err){
                 console.log(err.message)
                 response.send("Error occurred.")
             } else if (!usernameExists) {
-                response.send("Username does not exist. Create an account <a href='/newacc'>here</a>.")
+                response.send("Username does not exist. Create an account <a href='/user/new'>here</a>.")
             } else if(!logInSuccess){
                 response.send("Incorrect password.")
             } else if(logInSuccess) {
-                let role = x.role.slice(0, x.role.length-1)
-                response.cookie('userID', res.rows[0][role+'_id'])
+                response.cookie('userID', res.rows[0]['user_id'])
                 response.cookie('role', res.rows[0].role)
-                response.cookie('sessionCookie', sha256(res.rows[0][role+'_id']+SALT+res.rows[0].role))
+                response.cookie('sessionCookie', sha256(res.rows[0]['user_id']+SALT+res.rows[0].role))
                 response.redirect("/")
             }
 
@@ -90,7 +88,7 @@ module.exports = (allModels) => {
                 console.log(err.message)
                 response.send("Error occurred.")
             } else if (usernameExists) {
-                response.redirect('/newacc')
+                response.render('signup', {usernameTaken: true})
             } else {
                 response.send('Sign up successful - <a href="/">log in at the homepage</a>.')
             }

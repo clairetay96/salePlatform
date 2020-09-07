@@ -1,7 +1,10 @@
-let allDeadlines = document.querySelectorAll(".livetime")
+let allDeadlines = document.querySelectorAll(".countdown")
+
+let countdownFunc =
+
 
 allDeadlines.forEach((element)=>{
-    let countDownDate = Date.parse(element.innerText)
+    let countDownDate = Date.parse(element.querySelector(".livetime").innerText)
     var myFunc = setInterval(()=>{
         let now = new Date()
         let timeleft = countDownDate - now
@@ -11,16 +14,31 @@ allDeadlines.forEach((element)=>{
         let minutes = Math.floor((timeleft % (1000 * 60 * 60)) / (1000 * 60));
         let seconds = Math.floor((timeleft % (1000 * 60)) / 1000);
 
+        let countdown;
 
-        let countdown = document.createElement("p")
-        countdown.innerText = days+" days "+hours+" hours "+minutes+" minutes "+seconds+" seconds"
+        if(timeleft<=0){
+            countdown = "SALE IS LIVE!"
+        } else if(days>=1){
+            countdown = days==1? days + " day": days + " days"
+        } else {
+            countdown = hours + ":" + minutes + ":" + seconds
+        }
 
-        element.querySelector(".countdown").innerHTML = ""
-        element.querySelector(".countdown").appendChild(countdown)
+        element.querySelector(".timer").innerHTML = countdown
 
 
 
     }, 1000)
 
+
+})
+
+let allClickedRows = document.querySelectorAll(".table-row-link")
+
+allClickedRows.forEach((item)=>{
+    item.addEventListener("click", ()=>{
+        let orderID = item.querySelector(".order-ID").innerText
+        window.location = "/orders/"+orderID
+    })
 
 })

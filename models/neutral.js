@@ -19,12 +19,12 @@ module.exports = (dbPool) =>{
     }
 
     let logInVerify = (values, callback) =>{
-        let queryText = "SELECT * FROM "+values[2]+" WHERE username=$1"
+        let queryText = "SELECT * FROM (SELECT seller_id AS user_id, username,password,role FROM sellers UNION ALL SELECT buyer_id AS user_id, username,password,role FROM buyers) AS all_users WHERE username=$1"
         dbPool.query(queryText, [values[0]], (err, res)=>{
             if(err){
                 console.log(err.message)
                 callback(err, null,null,null)
-            } else if(res&&res.rows.length==0){
+            } else if(res.rows.length==0){
                 callback(err, res, false, false)
             } else {
                 callback(err, res, true, res.rows[0].password==values[1])

@@ -116,8 +116,9 @@ module.exports = (dbPool) =>{
 
     }
 
+    //when a seller is tracked, all of their sales are added to the buyers tracking
     let trackSellerQuery = (buyerID, sellerUsername, callback) => {
-        let queryText = "SELECT * FROM sellers WHERE username=$1 LIMIT 1"
+        let queryText = "SELECT * FROM sellers WHERE username=$1"
         dbPool.query(queryText, [sellerUsername])
             .then((res)=>{
                 if(res.rows.length==0){
@@ -127,14 +128,39 @@ module.exports = (dbPool) =>{
                     let values = [seller_id, buyerID]
                     let queryText1 = "INSERT INTO seller_tracker(seller_id, buyer_id) VALUES($1,$2)"
                     dbPool.query(queryText1, values)
-                        .then((res1)=>{callback(null, true, res)})
-                        .catch((err1)=>{callback(err1, null, null)})
+                        .then((res1)=>{
+                            let queryText2 = "SELECT sale_id FROM sales WHERE seller_id=$1"
+                            dbPool.query(queryText2, [seller_id])
+                                .then(res2=>{
+                                    saleIDs = res2.rows.map(sale=>sale.sale_id)
+
+                                    let allQueries = []
+                                    saleIDs.forEach((id)=>{
+                                        let queryText3 = "SELECT * FROM sale_tracker WHERE buyer_id=$1 AND sale_id=$2"
+                                        allQueries.push(dbPool.query(queryText3, [buyerID, id])
+                                            .then(res3=>{
+                                                if(res3.rows.length==0){
+                                                    let queryText4 = "INSERT INTO sale_tracker(buyer_id, sale_id) VALUES ($1,$2)"
+                                                    allQueries.push(dbPool.query(queryText4, [buyerID, id])
+                                                            .then(res4=>res4)
+                                                            .catch(err4=>err4))
+                                                }
+                                            })
+                                            .catch(err3=>{callback(err3, null,null)}))
+                                    })
+                                    Promise.all(allQueries)
+                                        .then(res5=>{callback(null, true, res5)})
+                                        .catch(err5=>{callback(err5, null,null)})
+                                })
+                                .catch(err2=>{callback(err2, null,null)})
+                        })
+                        .catch(err1=>{callback(err1, null,null)})
                 }
             })
             .catch((err)=>{callback(err, null, null)})
-
     }
 
+    //when a seller is untracked, no changes to tracked sales - but seller's new sales are not added.
     let removeTrackSeller = (buyerID, sellerUsername, callback) => {
         let queryText = "SELECT * FROM sellers WHERE username=$1"
         dbPool.query(queryText, [sellerUsername])
@@ -157,7 +183,7 @@ module.exports = (dbPool) =>{
 
     let buyerInfoFromID = (buyerID, callback)=> {
         let allQueries = []
-        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT buyer_id, foo.seller_id,username,sale_id,time_live FROM (SELECT buyer_id, seller_tracker.seller_id,username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON foo.seller_id=sales.seller_id) AS bar', 'orders']
+        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
 
         tables.forEach((table)=>{
             let queryText = `SELECT * FROM ${table} WHERE buyer_id=$1`
@@ -181,6 +207,24 @@ module.exports = (dbPool) =>{
             .catch((err)=>{callback(err,null)})
     }
 
+    let getOrderInfo = (orderID, buyerID, callback)=>{
+        let queryText = "SELECT username, sale_name,timestamp,time_live,order_id, sales.sale_id FROM (SELECT username, sale_id,order_id,buyer_id,timestamp FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id WHERE order_id=$1 AND buyer_id=$2"
+        dbPool.query(queryText, [orderID, buyerID])
+            .then((res)=>{
+                if(res.rows.length ==0){
+                    callback(null, false, null)
+                } else {
+                    let saleInfo = res.rows[0]
+                    let queryText1 = "SELECT item_name, quantity, amt_charged FROM order_details INNER JOIN catalogue ON order_details.item_id=catalogue.item_id WHERE order_id=$1"
+                    dbPool.query(queryText1, [orderID])
+                        .then((res1)=>{
+                            saleInfo.allItems = res1.rows
+                            callback(null, true, saleInfo)})
+                }
+            })
+            .catch((err)=>{callback(err, null,null)})
+    }
+
 
 
     return {
@@ -189,6 +233,7 @@ module.exports = (dbPool) =>{
         removeTrackSale,
         trackSellerQuery,
         removeTrackSeller,
-        buyerInfoFromID
+        buyerInfoFromID,
+        getOrderInfo
     }
 }

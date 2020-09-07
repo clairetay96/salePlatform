@@ -33,7 +33,6 @@ module.exports = (app, allModels) => {
     app.post("/seller/catalogue/edit/", sellerControllerFunc.newCatalogueForm)
 
     //delete catalogue items
-    app.delete("/seller/catalogue/edit/delete_all")
     app.delete("/seller/catalogue/edit/delete_item/:id")
 
     //show seller page, catalogue, upcoming sales
@@ -55,16 +54,18 @@ module.exports = (app, allModels) => {
     //edit sale_id table
     app.get("/seller/:username/sales/:id/edit", sellerControllerFunc.renderEditSaleForm)
     app.put("/seller/:username/sales/:id/edit", sellerControllerFunc.updateSale)
-    //edit sales table, drop sale_id table.
+    //delete row from sales table, drop sale_id table - only if sale is not live yet
     app.delete("/seller/:username/sales/:id/delete", sellerControllerFunc.deleteSale)
+
+    //get order details for each saleid
+    app.get("/seller/:username/sales/:saleid/orders", sellerControllerFunc.getSaleOrders)
+
+    //get order details for each orderID for buyer
+    app.get("/orders/:orderid", buyerControllerFunc.getOrder)
 
     //if buyer is logged in can track a sale, and delete tracking
     app.post("/seller/:username/sales/:id/track", buyerControllerFunc.trackSale)
     app.delete("/seller/:username/sales/:id/track", buyerControllerFunc.untrackSale)
-
-    //get buyer tracked sales and buyer tracked sellers. option to "untrack" on page.
-    app.get("/buyer/:username/tracked_sales")
-    app.get("/buyer/:username/tracked_sellers")
 
     //only renders past a certain time, for buyers only
     app.get("/seller/:username/sales/:id/live", buyerControllerFunc.saleLivePage)

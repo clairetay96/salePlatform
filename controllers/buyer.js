@@ -148,6 +148,32 @@ module.exports = (allModels) => {
 
     }
 
+    let getOrder = (request, response) =>{
+        if(buyerLoggedIn(request)){
+            let orderID = request.params.orderid
+            let buyerID = request.cookies['userID']
+            db_buyer.getOrderInfo(orderID, buyerID, (err, isValid,res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.send("Error occurred.")
+                } else if (!isValid) {
+                    response.send("You do not have permission to view this page.")
+                } else {
+                    res.loggedIn = true
+                    console.log(res)
+                    response.render('buyerOrder', res)
+
+                }
+
+        })
+
+        } else {
+            response.send("You do not have permission to view this page.")
+        }
+
+
+    }
+
 
 
 
@@ -158,7 +184,8 @@ module.exports = (allModels) => {
         untrackSale,
         trackSeller,
         untrackSeller,
-        saleLivePage
+        saleLivePage,
+        getOrder
     }
 
 }

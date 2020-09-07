@@ -4,7 +4,11 @@ import NavBar from './components/navBar.jsx'
 
 class SignUp extends React.Component {
     render() {
+        let message;
+        if(this.props.usernameTaken){
+            message = <p>That usename was taken.</p>
 
+        }
         let loggedIn = false
 
         return (
@@ -14,6 +18,7 @@ class SignUp extends React.Component {
                 <NavBar loggedIn={loggedIn}/>
                     <form method="POST" action="/user/new/">
                         New Username: <input type="text" name="username"/> <br/><br/>
+                        {message}
                         New Password: <input type="password" name="password"/> <br/><br/>
                         Role: <select name="role">
                             <option disabled selected value>  --Select an option--  </option>

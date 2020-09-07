@@ -6,45 +6,97 @@ class Homepage extends React.Component {
     render() {
         let buyerUsername = this.props.buyer.rows[0].username
         let buyersSalesTr = this.props['sales_tracked'].rows
+
+        buyersSalesTr.sort((a,b)=>{
+            let date1 = Date.parse(a.time_live)
+            let date2 = Date.parse(b.time_live)
+            return date1-date2
+        })
+
+
         let buyersSellersTr = this.props['sellers_tracked'].rows
         let buyersOrders = this.props.orders.rows
         let loggedIn = this.props.loggedIn
 
+        let hiddenStyle= {display: 'none'}
+
         let trackedSellerHTML = buyersSellersTr.map((item)=>{
-            return <p>{item.username}, {item.sale_id}, <span className="livetime">{item.time_live}<span className="countdown"></span></span></p>
+            let untrackURL = "/seller/"+item.username+"/track?_method=DELETE"
+            let sellerPage="/seller/"+item.username+"/"
+            return (<div>
+                    <div><a href={sellerPage}>{item.username}</a></div>
+                    <form method="POST" action={untrackURL}>
+                        <input type="submit" value="Untrack"/>
+                    </form>
+                </div>)
         })
 
         let trackedSaleData = buyersSalesTr.map((item)=>{
-            return (<tr>
-                <td>{item.seller_username}</td> <td>{item.sale_id}</td></tr>)
+            let now = new Date()
+            let dropDate = Date.parse(item.time_live)
+            let toSaleButton;
+
+            if(now >= dropDate){
+                let liveSaleURL = "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/live"
+                toSaleButton = <a href={liveSaleURL}><button>TO LIVE SALE</button></a>
+
+            } else {
+                let waitRoomURL= "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/"
+                toSaleButton = <a href={waitRoomURL}><button>To waiting room</button></a>
+
+            }
+
+            let untrackURL = "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/track?_method=DELETE"
+            let sellerURL = "/seller/"+item.seller_username+"/"
+
+            return (
+                <tr>
+                    <td><a href={untrackURL}>{item.seller_username}</a></td>
+                     <td>{item.sale_name}</td>
+                     <td><div className="countdown"><span className="timer"></span><span className="livetime" style={hiddenStyle}>{item.time_live}</span></div></td>
+                     <td>{toSaleButton}</td>
+                     <td><form method="POST" action={untrackURL}><input type="submit" value="x"/></form></td>
+                </tr>)
         })
 
-        let trackedSaleHTML = <table><tr><th>Seller Username</th><th>Sale ID</th></tr>{trackedSaleData}</table>
+        let trackedSaleHTML = (
+            <table>
+                <tr>
+                    <th>Seller</th>
+                    <th>Sale</th>
+                    <th>Time to sale</th>
+                    <th>Go to sale</th>
+                    <th>untrack sale</th>
+                </tr>
+                {trackedSaleData}
+            </table>)
+
 
 
         let ordersData = buyersOrders.map((item)=>{
+            let orderURL = "/orders/"+item.order_id
             return (
-                <tr>
-                    <td>{item.sale_id}</td>
-                    <td>Seller name</td>
-                    <td>{item.order_id}</td>
-                    <td>Drop Date</td>
+                <tr className="table-row-link">
+                    <td>{item.sale_name}</td>
+                    <td>{item.username}</td>
+                    <td className="order-ID">{item.order_id}</td>
+                    <td>{item.timestamp.toString().slice(4,16)}</td>
                 </tr>)
         })
 
         let ordersHTML = (
-            <table>
+            <table className="orders">
                 <tr>
                     <th>Sale</th>
                     <th>Seller</th>
                     <th>Order ID</th>
-                    <th>Drop Date</th>
+                    <th>Order Date</th>
                 </tr>{ordersData}
             </table>)
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/buyerhp.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                 <h1>Welcome, {buyerUsername}.</h1>
