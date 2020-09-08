@@ -23,7 +23,7 @@ class Homepage extends React.Component {
         let trackedSellerHTML = buyersSellersTr.map((item)=>{
             let untrackURL = "/seller/"+item.username+"/track?_method=DELETE"
             let sellerPage="/seller/"+item.username+"/"
-            return (<div>
+            return (<div className="tracked-seller">
                     <div><a href={sellerPage}>{item.username}</a></div>
                     <form method="POST" action={untrackURL}>
                         <input type="submit" value="Untrack"/>
@@ -38,7 +38,7 @@ class Homepage extends React.Component {
 
             if(now >= dropDate){
                 let liveSaleURL = "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/live"
-                toSaleButton = <a href={liveSaleURL}><button>TO LIVE SALE</button></a>
+                toSaleButton = <a href={liveSaleURL}><button className="live">TO LIVE SALE</button></a>
 
             } else {
                 let waitRoomURL= "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/"
@@ -48,25 +48,26 @@ class Homepage extends React.Component {
 
             let untrackURL = "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/track?_method=DELETE"
             let sellerURL = "/seller/"+item.seller_username+"/"
+             console.log(item)
 
             return (
-                <tr>
-                    <td><a href={untrackURL}>{item.seller_username}</a></td>
+                <tr className="tracked-sale-row">
+                    <td><a href={sellerURL}>{item.seller_username}</a></td>
                      <td>{item.sale_name}</td>
-                     <td><div className="countdown"><span className="timer"></span><span className="livetime" style={hiddenStyle}>{item.time_live}</span></div></td>
+                     <td><div className="countdown text-center"><span className="timer"></span><span className="livetime" style={hiddenStyle}>{item.time_live}</span></div></td>
                      <td>{toSaleButton}</td>
-                     <td><form method="POST" action={untrackURL}><input type="submit" value="x"/></form></td>
+                     <td className="align-to-right"><form method="POST" action={untrackURL}><input type="submit" value="x"/></form></td>
                 </tr>)
         })
 
         let trackedSaleHTML = (
-            <table>
+            <table id="tracked-sales">
                 <tr>
                     <th>Seller</th>
                     <th>Sale</th>
                     <th>Time to sale</th>
-                    <th>Go to sale</th>
-                    <th>untrack sale</th>
+                    <th></th>
+                    <th></th>
                 </tr>
                 {trackedSaleData}
             </table>)
@@ -79,7 +80,7 @@ class Homepage extends React.Component {
                 <tr className="table-row-link">
                     <td>{item.sale_name}</td>
                     <td>{item.username}</td>
-                    <td className="order-ID">{item.order_id}</td>
+                    <td className="order-ID text-center">{item.order_id}</td>
                     <td>{item.timestamp.toString().slice(4,16)}</td>
                 </tr>)
         })
@@ -96,27 +97,33 @@ class Homepage extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/buyerhp.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/dashboards.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
-                <h1>Welcome, {buyerUsername}.</h1>
-                <div className="row">
-                    <div className="col-md-5 offset-md-1">
-                        <h4>Tracked Drops</h4>
-                        {trackedSaleHTML}
+                <div className="container">
+                    <div className="welcome-header">
+                        <h1>Welcome, {buyerUsername}.</h1>
                     </div>
-                    <div className="col-md-5">
-                        <div>
-                            <h4>Tracked Sellers</h4>
-                                {trackedSellerHTML}
+                    <div className="row">
+                        <div className="col-md-7">
+                            <div className="tracked-drops">
+                                <h4>Tracked Drops</h4>
+                                {trackedSaleHTML}
+                            </div>
                         </div>
-                        <div>
-                            <h4>Transaction History</h4>
-                                {ordersHTML}
+                        <div className="col-md-5">
+                            <div className="tracked-sellers">
+                                <h4>Tracked Sellers</h4>
+                                    {trackedSellerHTML}
+                            </div>
+                            <div className="order-history">
+                                <h4>Transaction History</h4>
+                                    {ordersHTML}
+                            </div>
                         </div>
                     </div>
                 </div>
-                    <script src="/countdown.js"></script>
+                    <script src="/dashboards.js"></script>
                 </body>
             </html>)
     }

@@ -19,14 +19,14 @@ module.exports = (dbPool) =>{
                             failedQueries.push(
                                 dbPool.query(queryText3, [query[0], sellerID])
                                     .then(res3 => "Insufficient number of "+res3.rows[0].item_name+", purchase unsuccessful." )
-                                    .catch(err3 => {callback(err3, null, null)})
+                                    .catch(err3 => err3)
                             )
                         } else {
                             let queryText = `UPDATE sales_${saleID} SET quantity = quantity - ${query[1]}  WHERE item_id=$1`
                             successQueries.push(
                                 dbPool.query(queryText, [query[0]])
                                     .then((res)=>query)
-                                    .catch((err)=>{callback(err, null, null)})
+                                    .catch((err)=>err)
                             )
                         }
                 })
@@ -62,7 +62,7 @@ module.exports = (dbPool) =>{
 
                                         Promise.all(orderDetailPromises)
                                             .then((res)=>callback(null, orderID, failedQueries))
-                                            .catch((err)=>callback(err, null, null))
+                                            .catch((err)=>err)
                                     })
                                 }
                             })
@@ -76,6 +76,7 @@ module.exports = (dbPool) =>{
                 })
 
             })
+            .catch(err=>{callback(err, null,null)})
 
     }
 
@@ -91,7 +92,7 @@ module.exports = (dbPool) =>{
                     let queryText1 = "INSERT INTO sale_tracker(sale_id, buyer_id) VALUES($1,$2)"
                     dbPool.query(queryText1, values)
                         .then((res1)=>{callback(null, true, res)})
-                        .catch((err1)=>{callback(err1, null, null)})
+                        .catch((err1)=>err1)
                 }
             })
             .catch((err)=>{callback(err, null, null)})
@@ -109,7 +110,7 @@ module.exports = (dbPool) =>{
                         .then(res1 => {
                             callback(null, true, res1)
                         })
-
+                        .catch(err=>err)
                 }
             })
             .catch((err)=>{callback(err, null, null)})
@@ -133,7 +134,6 @@ module.exports = (dbPool) =>{
                             dbPool.query(queryText2, [seller_id])
                                 .then(res2=>{
                                     saleIDs = res2.rows.map(sale=>sale.sale_id)
-
                                     let allQueries = []
                                     saleIDs.forEach((id)=>{
                                         let queryText3 = "SELECT * FROM sale_tracker WHERE buyer_id=$1 AND sale_id=$2"
@@ -141,20 +141,20 @@ module.exports = (dbPool) =>{
                                             .then(res3=>{
                                                 if(res3.rows.length==0){
                                                     let queryText4 = "INSERT INTO sale_tracker(buyer_id, sale_id) VALUES ($1,$2)"
-                                                    allQueries.push(dbPool.query(queryText4, [buyerID, id])
+                                                    dbPool.query(queryText4, [buyerID, id])
                                                             .then(res4=>res4)
-                                                            .catch(err4=>err4))
+                                                            .catch(err4=>{callback(err4, null,null)})
                                                 }
                                             })
-                                            .catch(err3=>{callback(err3, null,null)}))
+                                            .catch(err3=>err3))
                                     })
                                     Promise.all(allQueries)
                                         .then(res5=>{callback(null, true, res5)})
                                         .catch(err5=>{callback(err5, null,null)})
                                 })
-                                .catch(err2=>{callback(err2, null,null)})
+                                .catch(err2=>err2)
                         })
-                        .catch(err1=>{callback(err1, null,null)})
+                        .catch(err1=>err1)
                 }
             })
             .catch((err)=>{callback(err, null, null)})
@@ -173,7 +173,7 @@ module.exports = (dbPool) =>{
                     let queryText1 = "DELETE FROM seller_tracker WHERE seller_id=$1 AND buyer_id=$2"
                     dbPool.query(queryText1, values)
                         .then((res1)=>{callback(null, true, res)})
-                        .catch((err1)=>{callback(err1, null, null)})
+                        .catch((err1)=>err1)
                 }
             })
             .catch((err)=>{callback(err, null, null)})
@@ -183,7 +183,7 @@ module.exports = (dbPool) =>{
 
     let buyerInfoFromID = (buyerID, callback)=> {
         let allQueries = []
-        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
+        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, sale_name,username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
 
         tables.forEach((table)=>{
             let queryText = `SELECT * FROM ${table} WHERE buyer_id=$1`

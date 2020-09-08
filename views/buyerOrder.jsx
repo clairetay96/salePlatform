@@ -42,6 +42,8 @@ class BuyerOrder extends React.Component {
 
             </table>)
 
+        let headerStyle = {'margin-top': '20px'}
+
 
 
         return (
@@ -49,39 +51,41 @@ class BuyerOrder extends React.Component {
                 <Head />
                 <body>
                     <NavBar loggedIn={loggedIn}/>
-                    <div>
-                        <h1>Your Order</h1>
-                        <h3>Purchase Info</h3>
-                        <table>
-                            <tr>
-                                <td>Seller:</td>
-                                <td><a href={"/seller/"+seller_username+"/"}>{seller_username}</a></td>
-                            </tr>
-                            <tr>
-                                <td>Sale:</td>
-                                <td>{sale_name}</td>
-                            </tr>
-                            <tr>
-                                <td>Sale ID:</td>
-                                <td>{saleID}</td>
-                            </tr>
-                            <tr>
-                                <td>Drop Date:</td>
-                                <td>{saleDropDate}</td>
-                            </tr>
-                            <tr>
-                                <td>Purchase Time: </td>
-                                <td>{purchaseTime}</td>
-                            </tr>
-                            <tr>
-                                <td>Order ID: </td>
-                                <td>{orderID}</td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div>
-                        <h3>Orders</h3>
-                        {orderTable}
+                    <div className="container">
+                        <div>
+                            <h1 style={headerStyle}>Your Order</h1>
+                            <h3>Purchase Info</h3>
+                            <table>
+                                <tr>
+                                    <td>Seller:</td>
+                                    <td><a href={"/seller/"+seller_username+"/"}>{seller_username}</a></td>
+                                </tr>
+                                <tr>
+                                    <td>Sale:</td>
+                                    <td>{sale_name}</td>
+                                </tr>
+                                <tr>
+                                    <td>Sale ID:</td>
+                                    <td>{saleID}</td>
+                                </tr>
+                                <tr>
+                                    <td>Drop Date:</td>
+                                    <td>{saleDropDate}</td>
+                                </tr>
+                                <tr>
+                                    <td>Purchase Time: </td>
+                                    <td>{purchaseTime}</td>
+                                </tr>
+                                <tr>
+                                    <td>Order ID: </td>
+                                    <td>{orderID}</td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div>
+                            <h3>Orders</h3>
+                            {orderTable}
+                        </div>
                     </div>
 
                 </body>

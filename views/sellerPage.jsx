@@ -13,38 +13,68 @@ class SellerPage extends React.Component {
         let isFollowing = this.props.isFollowing
         let loggedIn = this.props.loggedIn
 
+        let date_slicer = (date) =>{
+            let year = date.slice(0,2)
+            let month = date.slice(5,7)
+            let day = date.slice(8,10)
+            let time = date.slice(11,16)
+
+            return day+"/"+month+"/"+year+" "+time
+        }
+
         let followButton = <TrackSeller seller_username={seller_username} />
         if(isFollowing){
             followButton = <UntrackSeller seller_username={seller_username} />
         }
 
         let allItemsHTML = allItems.map((item)=>{
-            return <li>{item.item_name}</li>
+            return (<div className="catalogue-card">
+                    <img src={item.image_url}/>
+                        <div className="catalogue-card-header"><h6>{item.item_name}</h6></div>
+                        <div className="catalogue-card-desc">{item.product_desc}</div>
+                        <div className="catalogue-card-desc"><b>${item.price}</b></div>
+                        </div>)
         })
         let allSalesHTML = allSales.map((item)=>{
             let saleLink = "sales/" + item.sale_id + "/"
-            return <li><a href={saleLink}>{item.sale_id}</a></li>
+            return <tr>
+                <td><a href={saleLink}>{item.sale_name}</a></td>
+                <td className="text-right">{date_slicer(item.time_live)}</td>
+                </tr>
         })
+
+        let allSalesTable = (
+            <table>
+            {allSalesHTML}
+            </table>)
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/sellerPage.css"]}}/>
 
                 <body>
                     <NavBar loggedIn={loggedIn}/>
-                    <div className="card-headers">
+                    <div className="container">
+                    <div className="page-title">
                         <h1>{seller_username}</h1>
                             {followButton}
                     </div>
                     <div className="row">
-                        <div className="col-md-5 offset-md-1">
-                        <h3>Catalogue</h3>
-                            {allItemsHTML}
+                        <div className="col-md-6">
+                            <div className="catalogue">
+                                <h3>Catalogue</h3>
+                                <div className="catalogue-items">
+                                    {allItemsHTML}
+                                </div>
+                            </div>
                         </div>
-                        <div className="col-md-5">
-                        <h3>Upcoming Sales</h3>
-                            {allSalesHTML}
+                        <div className="col-md-6">
+                        <div className="upcoming-sales">
+                            <h3>Upcoming Sales</h3>
+                            {allSalesTable}
                         </div>
+                        </div>
+                    </div>
                     </div>
                 </body>
             </html>

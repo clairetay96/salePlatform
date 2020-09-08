@@ -39,7 +39,11 @@ class SaleForm extends React.Component {
                     </tr>)
         })
 
-        let deleteSale = <form method="POST" action={deleteURL}><input type="submit" value="Delete Sale"/></form>
+        let confirmClick = ()=>{
+            return confirm('Are you sure?')
+        }
+
+        let deleteSale = <div className="submit-button delete"><form method="POST" action={deleteURL}><input type="submit" value="Delete Sale"/></form></div>
 
         let allItemsTable = (<table>
             <tr>
@@ -53,32 +57,36 @@ class SaleForm extends React.Component {
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
-                    <div>
-                    <h2>Edit Sale</h2>
-                        <form method="POST" action={actionURL}>
-                            {allItemsTable}
-                            <br/><br/>
+                    <div className="container">
+                        <div className="form-title">
+                            <h2>Edit Sale</h2>
+                        </div>
+                            <form method="POST" action={actionURL}>
+                                {allItemsTable}
 
-                            Sale name<br/>
-                            <input type="text" name="sale_name" defaultValue={saleInfo.sale_name}/><br/>
-                            Sale description<br/>
-                            <textarea name="sale_desc" defaultValue={saleInfo.sale_desc}/>
+                                <div className="additional-deets">
+                                    <label>Sale name</label>
+                                    <input type="text" name="sale_name" defaultValue={saleInfo.sale_name}/>
+                                    <label>Sale description</label>
+                                    <textarea name="sale_desc" defaultValue={saleInfo.sale_desc}/>
 
-                            <div id="livedates">
-                                <div className="liveDate">
-                                    Date Live: <input type="datetime-local" name="time_live" defaultValue={saleInfo.time_live}/>
+                                    <div id="livedates">
+                                        <div className="liveDate">
+                                            Date Live <input type="datetime-local" name="time_live" defaultValue={saleInfo.time_live} required/>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" name="seller_id" value={sellerID}/>
+                                    <input type="hidden" name="sale_id" value={saleInfo.sale_id}/>
                                 </div>
-                            </div>
-                            <br/><br/>
-                            <input type="hidden" name="seller_id" value={sellerID}/>
-                            <input type="hidden" name="sale_id" value={saleInfo.sale_id}/>
-                            <input type="submit" value="Edit Sale"/>
-                        </form>
-                        {deleteSale}
-                    </div>
+                                <div className="submit-button">
+                                    <input type="submit" value="Edit Sale"/>
+                                </div>
+                            </form>
+                            {deleteSale}
+                        </div>
                 </body>
             </html>
             )

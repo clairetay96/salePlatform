@@ -10,14 +10,27 @@ class SellerHomepage extends React.Component {
         let loggedIn = this.props.loggedIn
         let seller_username = this.props.username
 
+        let date_slicer = (date) =>{
+            let year = date.slice(0,2)
+            let month = date.slice(5,7)
+            let day = date.slice(8,10)
+            let time = date.slice(11,16)
+
+            return day+"/"+month+"/"+year+" "+time
+        }
+
         let catalogueItemsHTML = catalogueItems.map((item)=>{
             let editURL = "/seller/catalogue/edit/"+item.item_id
             return (
-                <div>
+                <div className="catalogue-card">
                     <img src={item.image_url}/>
+                    <div className="catalogue-card-header">
                     <h5>{item.item_name}</h5>
                     <a href={editURL}>Edit</a>
-                    <p>{item.product_desc}</p>
+                    </div>
+                    <div className="catalogue-card-desc">
+                        {item.product_desc}
+                    </div>
                 </div>)
         })
 
@@ -36,7 +49,7 @@ class SellerHomepage extends React.Component {
             return (<tr className="table-row-link">
                 <td>{item.sale_name}</td>
                 <td className="sale-ID">{item.sale_id}</td>
-                <td>{item.time_live.slice(0,10)+" "+item.time_live.slice(11,16)}</td>
+                <td>{date_slicer(item.time_live)}</td>
                 <td>{item.order_count}</td>
                 </tr>)
         })
@@ -46,7 +59,7 @@ class SellerHomepage extends React.Component {
             <tr>
                 <th>Sale Name</th>
                 <th>ID</th>
-                <th>Date Live</th>
+                <th>Drop Time</th>
                 <th>Orders</th>
                 {pastSalesHTML}
             </tr>
@@ -57,60 +70,75 @@ class SellerHomepage extends React.Component {
             return (<tr>
                 <td>{item.sale_name}</td>
                 <td>{item.sale_id}</td>
-                <td>{item.time_live}</td>
+                <td>{date_slicer(item.time_live)}</td>
                 <td>{item.tracker_count}</td>
                 <td><a href={`/seller/${seller_username}/sales/${item.sale_id}/edit`}>Edit</a></td>
                 </tr>)
         })
 
+        let upcomingSalesTable = (<table>
+                        <tr>
+                            <th>Sale Name</th>
+                            <th>ID</th>
+                            <th>Drop Time</th>
+                            <th>Trackers</th>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                        {upcomingSalesHTML}
+                        </table>)
+
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/buyerhp.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/dashboards.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
+                <div class="container">
                 <div class="welcome-header">
                     <h1>Welcome, <span id="username">{seller_username}</span>.</h1>
-                    <p>Follower count: {followerNo}</p>
+                    <div>Followers: {followerNo}</div>
                 </div>
                 <div className="row">
 
-                    <div className="upcoming-drops col-md-5 offset-md-1">
+                    <div className="col-md-6">
+                    <div className="upcoming-drops">
                         <div className="card-headers">
                             <h3>Upcoming Drops</h3>
                             <a href="/seller/sales/new">Add a new sale</a>
                         </div>
-                        <table>
-                        <tr>
-                            <th>Sale Name</th>
-                            <th>ID</th>
-                            <th>Drop Date</th>
-                            <th>Trackers</th>
-                            <th>edit</th>
-                            <th></th>
-                        </tr>
-                        {upcomingSalesHTML}
-                        </table>
+                        {upcomingSalesTable}
+
+                        </div>
                     </div>
 
-                    <div className="past-drops col-md-5">
-                        <h3>Past Drops</h3>
-                        {pastSalesTable}
+                    <div className="col-md-6">
+                        <div className="past-drops">
+                            <div className="card-headers">
+                                <h3>Past Drops</h3>
+                            </div>
+                                {pastSalesTable}
+                        </div>
                     </div>
                 </div>
                 <br/>
 
                 <div className="row">
-                    <div className="catalogue col-md-10 offset-md-1">
-                        <div className="card-headers">
-                            <h3>Catalogue</h3>
-                            <a href="/seller/catalogue/edit/">Edit your catalogue</a>
+                    <div className="col-md-12">
+                        <div className="catalogue">
+                            <div className="card-headers">
+                                <h3>Catalogue</h3>
+                                <a href="/seller/catalogue/edit/">Edit your catalogue</a>
+                            </div>
+                            <div className="catalogue-items">
+                                {catalogueItemsHTML}
+                            </div>
                         </div>
-                            {catalogueItemsHTML}
                     </div>
+                </div>
                 </div>
 
 
-                    <script src="/countdown.js"></script>
+                    <script src="/dashboards.js"></script>
                 </body>
             </html>)
     }

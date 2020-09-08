@@ -1,6 +1,6 @@
 let allDeadlines = document.querySelectorAll(".countdown")
 
-let username = document.querySelector("#username").innerText
+let username =  document.querySelector("#username")? document.querySelector("#username").innerText : null
 
 
 allDeadlines.forEach((element)=>{
@@ -17,11 +17,17 @@ allDeadlines.forEach((element)=>{
         let countdown;
 
         if(timeleft<=0){
-            countdown = "SALE IS LIVE!"
+            countdown = "LIVE!"
         } else if(days>=1){
             countdown = days==1? days + " day": days + " days"
         } else {
-            countdown = hours + ":" + minutes + ":" + seconds
+            let units = [hours, minutes, seconds]
+            for(let i=0;i<units.length;i++){
+                if (units[i]<10){
+                    units[i] = "0" + units[i].toString()
+                }
+            }
+            countdown = units[0] + ":" + units[1] + ":" + units[2]
         }
 
         element.querySelector(".timer").innerHTML = countdown
@@ -46,4 +52,18 @@ allClickedRows.forEach((item)=>{
         }
     })
 
+})
+
+
+let trackedSales = document.querySelectorAll(".tracked-sale-row")
+
+trackedSales.forEach((element)=>{
+    element.addEventListener("mouseover", ()=>{
+        element.querySelector(".align-to-right").style.opacity = 0.8
+    })
+
+    element.addEventListener("mouseout", ()=>{
+        element.querySelector(".align-to-right").style.opacity = 0
+
+    })
 })

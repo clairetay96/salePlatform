@@ -6,10 +6,24 @@ class SellerCatalogue extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let allItemsHTML = <div></div>
+        let allItemsTable = <div></div>
+
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
-                return (<p>{item.item_name}  <a href={item.item_id}>Edit</a></p>)
+                let editURL = "/seller/catalogue/edit/"+item.item_id
+                return (<tr><td>{item.item_name}</td> <td>{item.product_desc}</td> <td><a href={editURL}>Edit</a></td></tr>)
             })
+
+            allItemsTable = (
+                <table>
+                    <tr>
+                        <th>Item</th>
+                        <th>Description</th>
+                        <th></th>
+                    </tr>
+                    {allItemsHTML}
+                </table>)
+
 
         }
         return (
@@ -17,7 +31,7 @@ class SellerCatalogue extends React.Component {
                 <Head />
                 <body>
                 <NavBar loggedIn={loggedIn}/>
-                    <div>
+                    <div className="container">
 
                         <h1>Your Catalogue</h1>
                         <div className="row">
@@ -30,7 +44,7 @@ class SellerCatalogue extends React.Component {
                         </div>
                             <div className="allItems">
                             <h3>Your items</h3>
-                                {allItemsHTML}
+                                {allItemsTable}
                             </div>
 
 

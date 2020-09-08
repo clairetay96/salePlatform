@@ -32,30 +32,38 @@ class SaleForm extends React.Component {
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
-                    <div>
-                    <h2>Add a new sale</h2>
+                    <div className="container">
+                    <div className="form-title">
+                        <h2>Add a new sale</h2>
+                    </div>
                         <form method="POST" action="/seller/sales/new/">
-                            {allItemsTable}
-                            <br/><br/>
-
-                            Sale name<br/>
-                            <input type="text" name="sale_name"/><br/>
-                            Sale description<br/>
-                            <textarea name="sale_desc"/>
-
-                            <div id="livedates">
-                                <div className="liveDate">
-                                    Date Live: <input type="datetime-local" name="time_live1"/>
-                                </div>
+                            <div className="item-table">
+                                {allItemsTable}
                             </div>
 
-                            <button type="button" id="addLiveDate">Add another date</button>
-                            <br/><br/>
-                            <input type="hidden" name="seller_id" value={sellerID}/>
-                            <input type="submit"/>
+                            <div className="additional-deets">
+                                <label>Sale name</label>
+                                <input type="text" name="sale_name" required/>
+                                <label>Sale description</label>
+                                <textarea name="sale_desc"/>
+
+                                <div id="livedates">
+                                    <div className="liveDate">
+                                    Date Live
+                                        <input type="datetime-local" name="time_live1" required/>
+                                    </div>
+                                </div>
+
+                                <button type="button" id="addLiveDate">Add another date</button>
+                                <br/><br/>
+                                <input type="hidden" name="seller_id" value={sellerID}/>
+                                <div className="submit-button">
+                                    <input type="submit"/>
+                                </div>
+                            </div>
                         </form>
                         <script src="/newSale.js"></script>
                     </div>

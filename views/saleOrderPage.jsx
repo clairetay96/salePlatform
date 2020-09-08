@@ -6,7 +6,7 @@ class SaleOrderPage extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let allRows = this.props.rows
-        let saleID = allRows[0].sale_id
+        let saleID = allRows[0] ? allRows[0].sale_id : null
 
         let orderDataHTML = allRows.map((item)=>{
             return (<tr>

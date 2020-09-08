@@ -1,0 +1,143 @@
+.orders tr:not(:first-child):hover, .past-sales tr:not(:first-child):hover {
+	background-color: rgba(50,152,255);
+	color: white;
+	transition: 0.3s;
+}
+
+
+
+.tracked-seller {
+	display: flex;
+	justify-content: space-between;
+	padding: 3px 15px 3px 20px;
+}
+
+.tracked-seller input[type="submit"] {
+	background-color: rgba(50,152,255);
+	color: white;
+	border: none;
+	font-size: 15px;
+	padding: 2px 5px;
+}
+
+.tracked-sellers {
+	height: 40vh;
+	border: 1px solid rgba(50,152,255);
+	padding: 15px 20px;
+	overflow: auto;
+}
+
+.order-history {
+	height: 80vh;
+	border: 1px solid rgba(50,152,255);
+	padding: 15px 20px;
+	margin: 10px 0;
+	overflow: auto;
+
+}
+
+.tracked-drops {
+	border: 1px solid rgba(50,152,255);
+	padding: 15px 20px;
+	height: calc( 120vh + 10px );
+	margin-bottom: 10px;
+	overflow: auto;
+
+}
+
+.welcome-header {
+	margin: 25px auto 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.upcoming-drops, .past-drops, .catalogue {
+	height: 75vh;
+	overflow: auto;
+	border: 1px solid rgba(50,152,255);
+	padding: 3px 12px;
+}
+
+.catalogue {
+	height: auto;
+	max-height: 2000px;
+	margin-bottom: 10px;
+}
+
+.card-headers {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: calc( ( 100% - 20px ));
+	margin: 25px auto 5px;
+}
+
+
+.catalogue-items {
+	display: flex;
+	flex-wrap: wrap;
+}
+
+.catalogue-card {
+	width: calc(( 100% - 20px ) / 2);
+	height: 70vh;
+	padding-top: 20px;
+	margin: 5px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	background-color: rgba(50,152,255,0.3);
+	overflow: auto;
+
+}
+
+.catalogue-card-header {
+	display: flex;
+	justify-content: space-between;
+	width: 80%;
+	margin: 12px auto 0;
+}
+
+.catalogue-card-desc {
+	width: 80%;
+}
+
+.catalogue-card img {
+	width: 80%;
+	height: 50%;
+	object-fit: cover;
+}
+
+#tracked-sales {
+	width: 95%;
+
+}
+
+#tracked-sales * {
+	overflow-wrap: break-word;
+}
+
+.align-to-right {
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+	opacity: 0;
+}
+
+.align-to-right input[type="submit"] {
+	border: none;
+	background-color: white;
+}
+
+.tracked-sale-row button {
+	background-color: rgba(50,152,255);
+	border: none;
+	padding: 5px 12px;
+}
+.tracked-sale-row button.live {
+	background-color: darkred;
+	color: white;
+	border: none;
+	padding: 5px 12px;
+}

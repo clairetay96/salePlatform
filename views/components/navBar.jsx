@@ -10,7 +10,7 @@ class NavBar extends React.Component {
         }
         return (
             <div id="nav-bar">
-                <div id="nav-logo"><a href="/"><h3>Hayaku!</h3></a></div>
+                <div id="nav-logo"><a href="/"><img src="/hayaku_logo_white.png"/></a></div>
                 <div id="log-button-div">{LogButton}</div>
             </div>
         )

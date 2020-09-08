@@ -10,7 +10,7 @@ class Homepage extends React.Component {
                 <body>
                     <div className="row homepage ">
                         <div className="col-md-6 logo">
-                        <h1>Hayaku!</h1>
+                        <div className="logo-div"><img src="/hayaku_logo_white.png"/></div>
                         <p>The one-stop solution to limited edition product drops, for sellers and product enthusiasts.</p>
                         </div>
 
