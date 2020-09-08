@@ -20,6 +20,8 @@ module.exports = (app, allModels) => {
     app.put("/user/edit")
     app.delete("/user/delete/")
 
+    app.get("/seller", noUserControllerFunc.getAllSellers)
+
     //Edit catalogue items - only if seller is logged in.
     //see all items
     app.get("/seller/catalogue/edit/", sellerControllerFunc.renderCatalogue )

@@ -1,8 +1,17 @@
-.catalogue, .upcoming-sales {
+.catalogue, .upcoming-sales, .past-sales {
 	border: 1px solid rgba(50,152,255);
 	padding: 15px;
+	overflow: auto;
+}
+
+.catalogue {
 	height: 150vh;
-	margin-bottom: 35px;
+	margin-bottom: 10px;
+}
+
+.upcoming-sales, .past-sales {
+	height: calc( ( 150vh - 10px ) / 2 );
+	margin-bottom: 10px
 }
 
 .page-title {

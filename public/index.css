@@ -62,3 +62,16 @@ td {
 #nav-logo img {
 	height: 45px;
 }
+
+.browse {
+	display: flex;
+	width: 20%;
+	margin: 0 5px%;
+	justify-content: space-around;
+	align-items: center;
+}
+
+.browse a {
+	color: white;
+	text-decoration: none;
+}

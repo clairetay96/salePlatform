@@ -10,10 +10,10 @@ class SellerPage extends React.Component {
         let allItems = this.props.catalogue.rows
         let allSales = this.props.sales.rows
         let seller_username = this.props.seller_username
-        console.log(seller_username)
         let isFollowing = this.props.isFollowing
-        console.log(isFollowing)
         let loggedIn = this.props.loggedIn
+
+        let now = new Date()
 
         let date_slicer = (date) =>{
             let year = date.slice(0,2)
@@ -37,17 +37,37 @@ class SellerPage extends React.Component {
                         <div className="catalogue-card-desc"><b>${item.price}</b></div>
                         </div>)
         })
-        let allSalesHTML = allSales.map((item)=>{
+        let upcomingSalesHTML = allSales.map((item)=>{
             let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
-            return <tr>
-                <td><a href={saleLink}>{item.sale_name}</a></td>
-                <td className="text-right">{date_slicer(item.time_live)}</td>
-                </tr>
+            if(now <= Date.parse(item.time_live)) {
+                return <tr>
+                    <td><a href={saleLink}>{item.sale_name}</a></td>
+                    <td className="text-right">{date_slicer(item.time_live)}</td>
+                    </tr>
+
+            }
         })
 
-        let allSalesTable = (
+        let upcomingSalesTable = (
             <table>
-            {allSalesHTML}
+            {upcomingSalesHTML}
+            </table>)
+
+
+        let pastSalesHTML = allSales.map((item)=>{
+            let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
+            if(now > Date.parse(item.time_live)) {
+                return <tr>
+                    <td><a href={saleLink}>{item.sale_name}</a></td>
+                    <td className="text-right">{date_slicer(item.time_live)}</td>
+                    </tr>
+
+            }
+        })
+
+        let pastSalesTable = (
+            <table>
+                {pastSalesHTML}
             </table>)
 
         return (
@@ -73,7 +93,11 @@ class SellerPage extends React.Component {
                         <div className="col-md-6">
                         <div className="upcoming-sales">
                             <h3>Upcoming Sales</h3>
-                            {allSalesTable}
+                            {upcomingSalesTable}
+                        </div>
+                        <div className="past-sales">
+                            <h3>Past Sales</h3>
+                            {pastSalesTable}
                         </div>
                         </div>
                     </div>

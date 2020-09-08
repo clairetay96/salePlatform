@@ -56,7 +56,7 @@ module.exports = (allModels) => {
                 console.log(err.message)
                 response.render('message', {loggedIn: false, message: 'Error occured.'})
             } else if (!usernameExists) {
-                response.send("Username does not exist. Create an account <a href='/user/new'>here</a>.")
+                response.render('message', {loggedIn: false, message: 'This username does not exist.'})
             } else if(!logInSuccess){
                 response.render('message', {loggedIn: false, message: 'Incorrect password.'})
             } else if(logInSuccess) {
@@ -86,7 +86,7 @@ module.exports = (allModels) => {
         db_neutral.newUser(values, (err, res, usernameExists)=>{
             if(err){
                 console.log(err.message)
-                response.render('message', {loggedIn: true, message: 'Error occurred.'})
+                response.render('message', {loggedIn: false, message: 'Error occurred.'})
             } else if (usernameExists) {
                 response.render('signup', {usernameTaken: true})
             } else {
@@ -102,11 +102,11 @@ module.exports = (allModels) => {
         db_seller.getSaleInfo(saleID, seller_username, isBuyer(request), (err, saleInfo, saleItems, isFollowing)=>{
             if(err){
                 console.log(err.message)
-                response.render('message', {loggedIn: true, message: 'Error occurred.'})
+                response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
             } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
                 response.render('message', {loggedIn: false, message: 'Sign up successful. Log in at the homepage.'})
             }else {
-                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: true})
+                response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: loggedIn(request)})
             }
         })
     }
@@ -116,14 +116,27 @@ module.exports = (allModels) => {
         db_seller.sellerInfo(seller_username, isBuyer(request), (err, sellerInfo, isFollowing)=>{
             if(err){
                 console.log(err.message)
-                response.render('message', {loggedIn: true, message: 'Error occurred.'})
+                response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
             } else {
                 sellerInfo.isFollowing = isFollowing
                 sellerInfo.seller_username = seller_username
-                sellerInfo.loggedIn = loggedIn(request) ? true : false
+                sellerInfo.loggedIn = loggedIn(request)
                 response.render('sellerPage', sellerInfo)
             }
         })
+    }
+
+    let getAllSellers = (request, response) =>{
+        db_seller.getAllSellers(isBuyer(request), (err, res)=>{
+            if(err){
+                console.log(err.message)
+                response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
+            } else {
+                res.loggedIn = loggedIn(request)
+                response.render('allSellers', res)
+            }
+        })
+
     }
 
     let logout = (request, response) =>{
@@ -142,7 +155,8 @@ module.exports = (allModels) => {
         logIn,
         logout,
         saleWaitingRoom,
-        sellerPage
+        sellerPage,
+        getAllSellers
     }
 
 }

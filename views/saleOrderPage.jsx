@@ -6,7 +6,7 @@ class SaleOrderPage extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let allRows = this.props.rows
-        let saleID = allRows[0] ? allRows[0].sale_id : null
+        let saleID = allRows[0] ? allRows[0].sale_id : this.props.sale_id
 
         let orderDataHTML = allRows.map((item)=>{
             return (<tr>
@@ -18,6 +18,10 @@ class SaleOrderPage extends React.Component {
                 <td>{item.amt_charged}</td>
             </tr>)
         })
+
+        if(allRows.length==0){
+            orderDataHTML = <tr><td colSpan="2">There are no orders for this sale yet.</td></tr>
+        }
 
         let orderDataTable = (
             <table>

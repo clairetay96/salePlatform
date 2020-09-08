@@ -77,29 +77,51 @@ module.exports = (dbPool) =>{
                     callback(err1, null,null)
                     return
                 } else {
-                    let queryText2 = "CREATE TABLE sales_"+res1.rows[0].sale_id+"(item_id INTEGER, quantity INTEGER, max_order INTEGER)"
-                    dbPool.query(queryText2, (err2, res2)=>{
-                        if(err2){
-                            callback(err2, null, null)
-                            return
-                        } else {
-                            let allQueries = []
-                            let tableName = "sales_"+res1.rows[0].sale_id
-                            inputRows.forEach((rowData)=>{
-                                let queryText3 = "INSERT INTO "+tableName+"(item_id, quantity,max_order) VALUES ($1,$2,$3)"
-                                allQueries.push(
-                                    dbPool.query(queryText3, rowData)
-                                        .then(res3=>res3)
-                                        .catch(err3=>err3)
-                                )
+                    let saleID = res1.rows[0].sale_id
+                    let queryText3 = "SELECT buyer_id FROM seller_tracker WHERE seller_id=$1"
+                    dbPool.query(queryText3, [seller_id])
+                        .then(res => res.rows)
+                        .then(followers => {
+                            let followPromises = []
+                            followers.forEach((buyer)=>{
+                                let queryText4 = "INSERT INTO sale_tracker (buyer_id, sale_id) VALUES ($1,$2)"
+                                followPromises.push(dbPool.query(queryText4,[buyer.buyer_id, saleID])
+                                                        .then(res=>res) )
                             })
-                             Promise.all(allQueries)
-                                    .then(res=>{callback(null, true, true)})
-                                    .catch(err=>{callback(err, null,null)})
+                            Promise.all(followPromises)
+                                .then((res)=>{
 
-                        }
+                                    let queryText2 = "CREATE TABLE sales_"+res1.rows[0].sale_id+"(item_id INTEGER, quantity INTEGER, max_order INTEGER)"
+                                    dbPool.query(queryText2, (err2, res2)=>{
+                                        if(err2){
+                                            callback(err2, null, null)
+                                            return
+                                        } else {
+                                            let allQueries = []
+                                            let tableName = "sales_"+res1.rows[0].sale_id
+                                            inputRows.forEach((rowData)=>{
+                                                let queryText3 = "INSERT INTO "+tableName+"(item_id, quantity,max_order) VALUES ($1,$2,$3)"
+                                                allQueries.push(
+                                                    dbPool.query(queryText3, rowData)
+                                                        .then(res3=>res3)
+                                                        .catch(err3=>err3)
+                                                )
+                                            })
+                                             Promise.all(allQueries)
+                                                    .then(res=>{callback(null, true, true)})
+                                                    .catch(err=>{callback(err, null,null)})
 
-                    })
+                                        }
+
+                                    })
+
+
+
+                                    })
+                                .catch(err=>{callback(err, null,null)})
+                        })
+                        .catch(err=>{callback(err, null ,null)})
+
                 }
             })
         })
@@ -329,6 +351,23 @@ module.exports = (dbPool) =>{
             .catch((err)=>{callback(err, null,null)})
     }
 
+    let getAllSellers = (isBuyerID, callback) =>{
+        if(isBuyerID){
+            let queryText = 'SELECT foo.seller_id, username, item_name, image_url, product_desc, price, buyer_id FROM (SELECT sellers.seller_id, username, item_name, image_url, product_desc, price FROM sellers INNER JOIN catalogue ON sellers.seller_id=catalogue.seller_id) AS foo LEFT JOIN (SELECT * FROM seller_tracker WHERE buyer_id=$1) AS bar ON foo.seller_id=bar.seller_id'
+            dbPool.query(queryText, [isBuyerID])
+                .then(res=>{callback(null,res)})
+                .catch((err)=>{callback(err, null)})
+
+
+        } else {
+            let queryText = 'SELECT sellers.seller_id, username, item_name, image_url, product_desc, price FROM sellers INNER JOIN catalogue ON sellers.seller_id=catalogue.seller_id;'
+            dbPool.query(queryText)
+                .then(res=>{callback(null,res)})
+                .catch((err)=>{callback(err, null)})
+
+        }
+    }
+
 
 
     return {
@@ -343,6 +382,7 @@ module.exports = (dbPool) =>{
         updateSaleInfo,
         closeSaleUpdate,
         deleteSale,
+        getAllSellers,
         getSaleOrderInfo
 
     }

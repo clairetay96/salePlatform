@@ -1,0 +1,50 @@
+.item-cards img {
+	object-fit: cover;
+	height: 80%;
+	width: 90%;
+	min-width: 150px;
+}
+
+.browse-items {
+	margin: 35px auto;
+	width: 80%;
+}
+
+.card-title {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.indiv-seller {
+	width: 95%;
+	height: 40vh;
+	margin: 10px auto;
+	padding: 12px;
+	border: 1px solid rgba(50,152,255);
+}
+
+.item-cards {
+	width: 95%;
+	height: 80%;
+	display: flex;
+	flex-wrap: nowrap;
+	overflow: auto;
+}
+
+.image-cards {
+	width: calc( (100% - 30px ) / 3);
+	min-width: 180px;
+	margin: 2px;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+}
+
+.item-desc {
+	font-size: 12px;
+	width: 90%;
+	display: flex;
+	justify-content: space-between;
+}
