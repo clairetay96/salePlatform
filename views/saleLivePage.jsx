@@ -1,12 +1,14 @@
 import React from 'react'
 import Head from './components/Head.jsx'
 import NavBar from './components/navBar.jsx'
+import Message from './message.jsx'
 
 class SaleLivePage extends React.Component {
     render() {
         let allItems = this.props.items.rows
         let saleInfo = this.props.sale.rows[0]
         let sellerID = allItems[0].seller_id
+        let closedState = saleInfo.sold_out
         let loggedIn = this.props.loggedIn
         let saleID = saleInfo.sale_id
         let postURL = "/seller/"+this.props.seller_username+"/sales/"+saleID+"/live"
@@ -38,7 +40,7 @@ class SaleLivePage extends React.Component {
             {allItemsHTML}
             </table>)
 
-        if(now >= Date.parse(saleInfo.time_live)){
+        if(now >= Date.parse(saleInfo.time_live)&&!closedState){
             return (
                 <html>
                     <Head additionalStyle={{otherScripts: ["/saleRooms.css"]}}/>
@@ -65,7 +67,7 @@ class SaleLivePage extends React.Component {
             )
 
         } else {
-            return (<p>Sale is not live yet.</p>)
+            return (<Message message="Sale is not live." loggedIn={true}/>)
         }
 
     }

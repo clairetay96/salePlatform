@@ -231,7 +231,7 @@ module.exports = (allModels) => {
                     console.log(err.message)
                     response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 }else if(cannotDelete){
-                    response.render('message', {loggedIn: true, message: 'You cannot delete a sale once it has gone live. You can close the sale instead.'})
+                    response.render('message', {loggedIn: true, message: 'You cannot delete a sale once it has gone live. You can close the sale instead - you can do this by going to the sale page.'})
                 } else {
                     response.redirect("/")
                 }
@@ -251,6 +251,14 @@ module.exports = (allModels) => {
             let saleID = request.params.id
             //must close sale and drop table, but will not remove orders from that sale.
             db_seller.closeSaleUpdate(sellerID, saleID, (err, isValid, res)=>{
+                if (err) {
+                    console.log(err.message)
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
+                } else if (!isValid) {
+                    response.render('message', {loggedIn: true, message: 'You do not have permission to perform this action.'})
+                } else {
+                    response.render('message', {loggedIn: true, message: 'Sale successfully closed.'})
+                }
 
             })
 
@@ -271,9 +279,12 @@ module.exports = (allModels) => {
                 } else if (!isValid) {
                     response.render('message', {loggedIn: true, message: 'You do not have permission to view this page.'})
                 } else if(res) {
-                    res.loggedIn = true
-                    res.sale_id = request.params.saleid
-                    response.render('saleOrderPage', res)
+                    console.log(res)
+                    let saleInfo = res[0]
+                    saleInfo.loggedIn = true
+                    saleInfo.sale_id = request.params.saleid
+                    saleInfo.seller_username = res[1].rows[0].username
+                    response.render('saleOrderPage', saleInfo)
                 }
 
             })

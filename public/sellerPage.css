@@ -56,3 +56,19 @@
 	height: 50%;
 	object-fit: cover;
 }
+
+.closed {
+	width: 90%;
+	background-color: black;
+	color: white;
+	text-align: center;
+	padding: 5px;
+}
+
+.live {
+	width: 90%;
+	background-color: darkred;
+	color:white;
+	text-align: center;
+	border:none;
+}

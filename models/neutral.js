@@ -32,9 +32,53 @@ module.exports = (dbPool) =>{
         })
     }
 
+    let getAllSales = (isBuyerID, callback) =>{
+        let queryText = "SELECT sale_id FROM sales"
+        dbPool.query(queryText)
+            .then((res)=>{
+                let allQueries = []
+                if(isBuyerID) {
+                    res.rows.forEach((item)=>{
+                        let saleID = item.sale_id
+                        let table = "sales_"+saleID
+                        let queryText1 = `SELECT fubar.sale_id, seller_id, sale_name, sale_desc, time_live, quantity, item_id, item_name, price,  image_url, username, buyer_id,sold_out FROM (SELECT bar.seller_id, sale_id, sale_name, sale_desc, item_name, quantity, price, time_live, image_url, username,item_id,sold_out FROM (SELECT foo.sale_id, foo.seller_id,sale_name, sale_desc, time_live, foo.item_id, item_name, image_url, price,quantity,sold_out FROM (SELECT sales.sale_id, sale_name, sale_desc, sold_out,time_live, item_id, quantity,seller_id FROM sales INNER JOIN ${table} ON sales.sale_id=${table}.sale_id) AS foo INNER JOIN catalogue ON foo.item_id=catalogue.item_id) AS bar INNER JOIN sellers ON bar.seller_id=sellers.seller_id) AS fubar LEFT JOIN (SELECT sale_id, buyer_id FROM sale_tracker WHERE buyer_id=$1) AS buyer_rel ON fubar.sale_id=buyer_rel.sale_id`
+                        allQueries.push(
+                            dbPool.query(queryText1, [isBuyerID])
+                                .then(res=>res)
+                                .catch(err=>{callback(err, null)})
+                                )
+                    })
+
+                    Promise.all(allQueries)
+                        .then(res=>{callback(null,res)})
+                        .catch(err=>{callback(err,null)})
+
+                } else {
+                    res.rows.forEach((item)=>{
+                        let saleID = item.sale_id
+                        let table="sales_"+saleID
+                        let queryText1 = `SELECT bar.seller_id, sale_id, sale_name, sale_desc, item_name, quantity, price, time_live, image_url, username,item_id FROM (SELECT foo.sale_id, foo.seller_id,sale_name, sale_desc, time_live, foo.item_id, item_name, image_url, price,quantity FROM (SELECT sales.sale_id, sale_name, sale_desc, time_live, item_id, quantity,seller_id FROM sales INNER JOIN ${table} ON sales.sale_id=${table}.sale_id) AS foo INNER JOIN catalogue ON foo.item_id=catalogue.item_id) AS bar INNER JOIN sellers ON bar.seller_id=sellers.seller_id`
+                        allQueries.push(
+                            dbPool.query(queryText1)
+                                .then(res=>res)
+                                .catch(err=>{callback(err, null)})
+                                )
+                    })
+                    Promise.all(allQueries)
+                        .then(res=>{callback(null,res)})
+                        .catch(err=>{callback(err,null)})
+
+                }
+
+                 })
+            .catch(err=>{callback(err, null)})
+
+    }
+
 
     return {
         newUser,
-        logInVerify
+        logInVerify,
+        getAllSales
     }
 }

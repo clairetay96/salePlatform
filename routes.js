@@ -21,6 +21,7 @@ module.exports = (app, allModels) => {
     app.delete("/user/delete/")
 
     app.get("/seller", noUserControllerFunc.getAllSellers)
+    app.get("/sales", noUserControllerFunc.getAllSales)
 
     //Edit catalogue items - only if seller is logged in.
     //see all items
@@ -34,8 +35,6 @@ module.exports = (app, allModels) => {
 
     app.post("/seller/catalogue/edit/", sellerControllerFunc.newCatalogueForm)
 
-    //delete catalogue items
-    app.delete("/seller/catalogue/edit/delete_item/:id")
 
     //show seller page, catalogue, upcoming sales
     app.get("/seller/:username", noUserControllerFunc.sellerPage)
@@ -56,8 +55,10 @@ module.exports = (app, allModels) => {
     //edit sale_id table
     app.get("/seller/:username/sales/:id/edit", sellerControllerFunc.renderEditSaleForm)
     app.put("/seller/:username/sales/:id/edit", sellerControllerFunc.updateSale)
-    //delete row from sales table, drop sale_id table - only if sale is not live yet
+    //delete row from sales table, drop sales_id table - only if sale is not live yet
     app.delete("/seller/:username/sales/:id/delete", sellerControllerFunc.deleteSale)
+    //if sale has gone live, it can be closed: sales_id will be dropped, but sale remains in sales table.
+    app.post("/seller/:username/sales/:id/close", sellerControllerFunc.closeSale)
 
     //get order details for each saleid
     app.get("/seller/:username/sales/:saleid/orders", sellerControllerFunc.getSaleOrders)

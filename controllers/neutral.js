@@ -103,8 +103,8 @@ module.exports = (allModels) => {
             if(err){
                 console.log(err.message)
                 response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
-            } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.render('message', {loggedIn: false, message: 'Sign up successful. Log in at the homepage.'})
+            } else if (!saleItems||saleInfo.rows.length==0||saleItems.rows.length==0){
+                response.render('message', {loggedIn: false, message: 'This sale has been closed.'})
             }else {
                 response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: loggedIn(request)})
             }
@@ -139,6 +139,19 @@ module.exports = (allModels) => {
 
     }
 
+    let getAllSales = (request, response ) =>{
+        db_neutral.getAllSales(isBuyer(request), (err, res)=>{
+            if(err){
+                console.log(err.message)
+                response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
+            } else {
+                let allSaleInfo = {sales: res, loggedIn: loggedIn(request)}
+                response.render('allSales', allSaleInfo)
+
+            }
+        })
+    }
+
     let logout = (request, response) =>{
         response.clearCookie('userID')
         response.clearCookie('role')
@@ -156,7 +169,8 @@ module.exports = (allModels) => {
         logout,
         saleWaitingRoom,
         sellerPage,
-        getAllSellers
+        getAllSellers,
+        getAllSales
     }
 
 }

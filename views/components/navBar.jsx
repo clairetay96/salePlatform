@@ -8,7 +8,7 @@ class NavBar extends React.Component {
             LogButton = <LogOutButton />
 
         }
-        let browse = <div className="browse"><a href="/seller">Sellers</a><a>Sales</a></div>
+        let browse = <div className="browse"><a href="/seller">Sellers</a><a href="/sales">Sales</a></div>
 
         return (
             <div id="nav-bar">

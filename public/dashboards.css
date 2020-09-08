@@ -141,3 +141,11 @@
 	border: none;
 	padding: 5px 12px;
 }
+
+.closed {
+	background-color: black;
+	width: 80%;
+	color: white;
+	text-align: center;
+	padding: 5px 10px;
+}

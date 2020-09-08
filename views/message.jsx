@@ -24,9 +24,7 @@ class CatalogueForm extends React.Component {
                         {message}
                         <p>Click <a href="/">here</a> to go to the homepage</p>
                         </div>
-
                     </div>
-                        }
                 </body>
             </html>
             )

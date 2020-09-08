@@ -56,9 +56,17 @@ class SellerPage extends React.Component {
 
         let pastSalesHTML = allSales.map((item)=>{
             let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
+            let liveLink = saleLink+"live"
             if(now > Date.parse(item.time_live)) {
+                let state;
+                if(item.sold_out){
+                    state=<div className="closed">CLOSED</div>
+                } else {
+                    state=<a href={liveLink}><button className="live">LIVE</button></a>
+                }
                 return <tr>
                     <td><a href={saleLink}>{item.sale_name}</a></td>
+                    <td className="justify-content-center">{state}</td>
                     <td className="text-right">{date_slicer(item.time_live)}</td>
                     </tr>
 

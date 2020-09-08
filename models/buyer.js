@@ -130,7 +130,7 @@ module.exports = (dbPool) =>{
                     let queryText1 = "INSERT INTO seller_tracker(seller_id, buyer_id) VALUES($1,$2)"
                     dbPool.query(queryText1, values)
                         .then((res1)=>{
-                            let queryText2 = "SELECT sale_id FROM sales WHERE seller_id=$1"
+                            let queryText2 = "SELECT sale_id FROM sales WHERE seller_id=$1 AND sold_out='f'"
                             dbPool.query(queryText2, [seller_id])
                                 .then(res2=>{
                                     saleIDs = res2.rows.map(sale=>sale.sale_id)
@@ -183,7 +183,7 @@ module.exports = (dbPool) =>{
 
     let buyerInfoFromID = (buyerID, callback)=> {
         let allQueries = []
-        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, sale_name,username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
+        let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, sale_name,username AS seller_username,sold_out FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name,sold_out FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
 
         tables.forEach((table, index)=>{
             let queryText = `SELECT * FROM ${table} WHERE buyer_id=$1`

@@ -68,7 +68,7 @@ class SellerHomepage extends React.Component {
 
         let upcomingSalesHTML = upcomingsales.map((item)=>{
             return (<tr>
-                <td>{item.sale_name}</td>
+                <td><a href={`/seller/${seller_username}/sales/${item.sale_id}/`}>{item.sale_name}</a></td>
                 <td>{item.sale_id}</td>
                 <td>{date_slicer(item.time_live)}</td>
                 <td>{item.tracker_count}</td>

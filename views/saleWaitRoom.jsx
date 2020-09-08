@@ -9,6 +9,7 @@ class SaleWaitRoom extends React.Component {
     render() {
         let allItems = this.props.items.rows
         let saleInfo = this.props.sale.rows[0]
+        let closedState = saleInfo.sold_out
         let saleID = saleInfo.sale_id
         let saleName = saleInfo.sale_name
         let saleDesc = saleInfo.sale_desc
@@ -21,6 +22,17 @@ class SaleWaitRoom extends React.Component {
         let followSaleButton = <TrackSaleButton seller_username={seller_username} sale_id={saleID}/>;
         if(isFollowing){
             followSaleButton = <UntrackSaleButton seller_username={seller_username} sale_id={saleID}/>
+        }
+
+        let counter_feature = (<div className="counter-feature">
+
+                        <div className="countdown"></div>
+                        <button id="liveSale">Click here to enter sale</button>
+                        <p className="desc-font text-center">Button goes live at <span id="date-req" className="livetime">{saleInfo.time_live.slice(0, 10)+" "+saleInfo.time_live.slice(11, 16)}</span></p>
+
+                        </div>)
+        if(closedState){
+            counter_feature=<div className="closed">This sale is now closed.<div className="desc-font">Click <a href='/'>here</a> to go back to the homepage.</div></div>
         }
 
         let allItemsHTML = allItems.map((item)=>{
@@ -68,14 +80,8 @@ class SaleWaitRoom extends React.Component {
                         <div className="notices">
                         You'll be quicker to checkout if you know what you want before the sale starts.<br/> Ensure your card details in your profile are correct and up to date to avoid unexpected hold ups.
                         </div>
+                            {counter_feature}
 
-                        <div className="counter-feature">
-
-                        <div className="countdown"></div>
-                        <button id="liveSale">Click here to enter sale</button>
-                        <p className="desc-font text-center">Button goes live at <span id="date-req" className="livetime">{saleInfo.time_live}</span></p>
-
-                        </div>
 
 
                         <script src="/saleWaitRoom.js"></script>

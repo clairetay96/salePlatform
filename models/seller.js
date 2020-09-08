@@ -91,7 +91,7 @@ module.exports = (dbPool) =>{
                             Promise.all(followPromises)
                                 .then((res)=>{
 
-                                    let queryText2 = "CREATE TABLE sales_"+res1.rows[0].sale_id+"(item_id INTEGER, quantity INTEGER, max_order INTEGER)"
+                                    let queryText2 = "CREATE TABLE sales_"+res1.rows[0].sale_id+"(item_id INTEGER, quantity INTEGER, max_order INTEGER, sale_id INTEGER DEFAULT "+res1.rows[0].sale_id+")"
                                     dbPool.query(queryText2, (err2, res2)=>{
                                         if(err2){
                                             callback(err2, null, null)
@@ -129,7 +129,7 @@ module.exports = (dbPool) =>{
 
     let sellerInfoFromID = (seller_id, callback) =>{
         let returnedValues = []
-        let tables = ['catalogue', '(SELECT bar.sale_id, bar.seller_id, time_live, sale_name, tracker_count, count AS order_count FROM (SELECT sales.sale_id, seller_id, time_live, sale_name, count AS tracker_count FROM sales LEFT JOIN (SELECT sale_id, COUNT(buyer_id) FROM sale_tracker GROUP BY sale_id) AS foo ON sales.sale_id=foo.sale_id) AS bar LEFT JOIN (SELECT sale_id, COUNT(order_id) FROM orders GROUP BY sale_id) AS orderfoo ON orderfoo.sale_id=bar.sale_id) AS fubar', 'seller_tracker', 'sellers']
+        let tables = ['catalogue', '(SELECT bar.sale_id, bar.seller_id, time_live, sale_name, tracker_count, count AS order_count, sold_out FROM (SELECT sales.sale_id, seller_id, time_live, sale_name, count AS tracker_count, sold_out FROM sales LEFT JOIN (SELECT sale_id, COUNT(buyer_id) FROM sale_tracker GROUP BY sale_id) AS foo ON sales.sale_id=foo.sale_id) AS bar LEFT JOIN (SELECT sale_id, COUNT(order_id) FROM orders GROUP BY sale_id) AS orderfoo ON orderfoo.sale_id=bar.sale_id) AS fubar', 'seller_tracker', 'sellers']
 
         tables.forEach((table, index)=>{
             let queryText = `SELECT * FROM ${table} WHERE seller_id=$1`
@@ -213,7 +213,7 @@ module.exports = (dbPool) =>{
                     callback(err1, res, res1, null)
                 } else {
                     if(err1){
-                        callback(err1, null,null,null)
+                        callback(err1, res,res1,null)
                     }
                     queryText2 = "SELECT * FROM sale_tracker WHERE buyer_id=$1 AND sale_id=$2"
                     dbPool.query(queryText2, [isBuyerID,saleID], (err2, res2)=>{
@@ -296,11 +296,16 @@ module.exports = (dbPool) =>{
     }
 
     let closeSaleUpdate = (sellerID, saleID, callback)=>{
+        let allQueries = []
 
-        let queryText="UPDATE sales SET sold_out='true' WHERE sale_id=$1 AND seller_id=$2"
+        let queryText="UPDATE sales SET sold_out='t' WHERE sale_id=$1 AND seller_id=$2 RETURNING *"
+        allQueries.push(dbPool.query(queryText, [saleID, sellerID])
+                            .then(res=>res)
+                            .catch(err=>{callback(err, null,null)}))
 
-
-        let queryText1 = "DROP TABLE sales_"+saleID
+        Promise.all(allQueries)
+            .then(res => {callback(null, res[0].rows.length > 0, res)})
+            .catch(err=> {callback(err, null,null)})
 
     }
 
@@ -315,16 +320,25 @@ module.exports = (dbPool) =>{
                 } else {
                     let allQueries = []
                     let table = "sales_"+saleID
+
                     let queryText1=`DROP TABLE ${table}`
                     allQueries.push(
                         dbPool.query(queryText1)
                             .then(res=>res)
                             .catch(err=>{callback(err, null,null)}))
+
                     let queryText2 = `DELETE FROM sales WHERE seller_id=$1 AND sale_id=$2`
                     allQueries.push(
                         dbPool.query(queryText2, [sellerID, saleID])
                             .then(res=>res)
                             .catch(err=>{callback(err, null,null)}))
+
+                    let queryText3="DELETE FROM sale_tracker WHERE sale_id=$1"
+                    allQueries.push(
+                        dbPool.query(queryText3, [saleID])
+                            .then(res=>res)
+                            .catch(err=>{callback(err,null,null)}))
+
                     Promise.all(allQueries)
                     .then(res=>{callback(null,null,true)})
                     .catch(err=>{callback(err, null,null)})
@@ -342,10 +356,21 @@ module.exports = (dbPool) =>{
                 if(res.rowCount==0){
                     callback(null, false, null)
                 } else {
-                    let queryText1 = "SELECT order_id, sale_id, buyer_id, timestamp, username, bar.item_id, quantity, amt_charged, item_name FROM (SELECT foo.order_id, sale_id,buyer_id, timestamp, username, item_id, quantity, amt_charged FROM (SELECT order_id, sale_id, orders.buyer_id, timestamp, username FROM orders INNER JOIN buyers ON orders.buyer_id=buyers.buyer_id) AS foo INNER JOIN order_details ON foo.order_id=order_details.order_id) AS bar INNER JOIN catalogue ON bar.item_id=catalogue.item_id WHERE sale_id=$1 ORDER BY order_id ASC"
-                    dbPool.query(queryText1, [saleID])
+                    let allQueries = []
+
+                    let queryText1 = "SELECT order_id, foobar.sale_id, buyer_id, timestamp, username, item_id, quantity, amt_charged, item_name, sold_out FROM (SELECT order_id, sale_id, buyer_id, timestamp, username, bar.item_id, quantity, amt_charged, item_name FROM (SELECT foo.order_id, sale_id,buyer_id, timestamp, username, item_id, quantity, amt_charged FROM (SELECT order_id, sale_id, orders.buyer_id, timestamp, username FROM orders INNER JOIN buyers ON orders.buyer_id=buyers.buyer_id) AS foo INNER JOIN order_details ON foo.order_id=order_details.order_id) AS bar INNER JOIN catalogue ON bar.item_id=catalogue.item_id) AS foobar INNER JOIN sales ON sales.sale_id=foobar.sale_id  WHERE sales.sale_id=$1 ORDER BY order_id ASC"
+                    allQueries.push(dbPool.query(queryText1, [saleID])
+                        .then((res)=>res)
+                        .catch((err)=>{callback(err, null, null)}))
+
+                    let queryText2 = "SELECT username FROM sellers WHERE seller_id=$1"
+                    allQueries.push(dbPool.query(queryText2, [sellerID])
+                        .then((res)=>res)
+                        .catch((err)=>{callback(err,null,null)}))
+
+                    Promise.all(allQueries)
                         .then((res)=>{callback(null,true,res)})
-                        .catch((err)=>{callback(err, null, null)})
+                        .catch((err)=>{callback(err, null,null)})
                 }
             })
             .catch((err)=>{callback(err, null,null)})
