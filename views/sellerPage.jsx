@@ -36,7 +36,7 @@ class SellerPage extends React.Component {
                         </div>)
         })
         let allSalesHTML = allSales.map((item)=>{
-            let saleLink = "sales/" + item.sale_id + "/"
+            let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
             return <tr>
                 <td><a href={saleLink}>{item.sale_name}</a></td>
                 <td className="text-right">{date_slicer(item.time_live)}</td>

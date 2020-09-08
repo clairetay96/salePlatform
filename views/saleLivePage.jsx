@@ -18,15 +18,15 @@ class SaleLivePage extends React.Component {
                 let itemPrice = "price"+item.item_id
                 return (
                     <tr className="saleItem">
-                        <td className="itemName">{item.item_name}<span>{item.quantity} remaining.</span></td>
+                        <td><h6 className="itemName">{item.item_name}</h6><div className="subtitle-font">Qty remaining: <b>{item.quantity}</b></div></td>
                         <td className="itemPrice">${item.price}</td>
                         <td>Qty: <input type="number" name={itemName} max={item.max_order} min="0" className="orderqty"/>
                         <input type="hidden" name={itemPrice} value={item.price}/></td>
                     </tr>)
             } else {
                 return (
-                    <tr className="saleItem">
-                        <td className="itemName">{item.item_name}<span>SOLD OUT</span></td>
+                    <tr>
+                        <td className="itemName"><h6>{item.item_name}</h6><div className="subtitle-font out"><b>SOLD OUT</b></div></td>
                         <td className="itemPrice">${item.price}</td>
                         <td></td>
                     </tr>)
@@ -34,25 +34,27 @@ class SaleLivePage extends React.Component {
         })
 
         let allItemsTable = (
-            <table>
+            <table id="sale-item-table">
             {allItemsHTML}
             </table>)
 
         if(now >= Date.parse(saleInfo.time_live)){
             return (
                 <html>
-                    <Head />
+                    <Head additionalStyle={{otherScripts: ["/saleRooms.css"]}}/>
                     <body>
                     <NavBar loggedIn={loggedIn}/>
-                        <div>
-                            <h1>LIVE SALE</h1>
+                        <div class="container">
                             <form method="POST" action={postURL}>
+                                <div className="all-items">
                                 {allItemsTable}
-                                <br/><br/>
+                                </div>
+
+                                <div className="confirm-order">
                                 <button type="button" id="confirm">Confirm order</button>
-                                <br/><br/>
                                 <input type="hidden" name="seller_id" value={sellerID}/>
                                 <input type="hidden" name="sale_id" value={saleID}/>
+                                </div>
 
                                 <div id="confirmOrder"></div>
                             </form>

@@ -185,8 +185,11 @@ module.exports = (dbPool) =>{
         let allQueries = []
         let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, sale_name,username AS seller_username FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
 
-        tables.forEach((table)=>{
+        tables.forEach((table, index)=>{
             let queryText = `SELECT * FROM ${table} WHERE buyer_id=$1`
+            if(index==3){
+                queryText += "ORDER BY timestamp DESC"
+            }
             allQueries.push(
                 dbPool.query(queryText, [buyerID])
                     .then(res=>res)

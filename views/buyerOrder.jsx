@@ -20,8 +20,8 @@ class BuyerOrder extends React.Component {
             return (
                     <tr>
                     <td>{order.item_name}</td>
-                    <td>{order.quantity}</td>
-                    <td>{order.amt_charged}</td>
+                    <td className="text-center">{order.quantity}</td>
+                    <td className="text-center">{order.amt_charged}</td>
                     </tr>
                     )
 
@@ -31,13 +31,13 @@ class BuyerOrder extends React.Component {
             <table>
                 <tr>
                     <th>Item</th>
-                    <th>Quantity</th>
-                    <th>Amount Charged</th>
+                    <th className="text-center">Quantity</th>
+                    <th className="text-center">Amount Charged</th>
                 </tr>
                 {ordersRows}
                 <tr>
-                    <td colspan="2">Total Amount</td>
-                    <td>{sumTotal.toFixed(2)}</td>
+                    <td colspan="2" className="text-right">Total Amount</td>
+                    <td className="text-center">{sumTotal.toFixed(2)}</td>
                 </tr>
 
             </table>)

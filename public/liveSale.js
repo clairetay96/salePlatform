@@ -41,18 +41,20 @@ confirmButton.addEventListener("click", ()=>{
 
     })
 
+    let message = document.createElement("p")
+    message.className= "subtitle-font"
+    message.innerText = "To edit your order, make changes on the main form, then click confirm order again."
+    confirmDiv.appendChild(message)
+
     let sumTotalRow = document.createElement("tr")
     sumTotalRow.innerHTML = `<td></td><td>Total</td><td>${sumTotal.toFixed(2)}</td>`
     tallyTable.appendChild(sumTotalRow)
 
     confirmDiv.appendChild(tallyTable)
 
-    let message = document.createElement("p")
-    message.innerText = "To edit your order, make changes on the main form, then click confirm order again."
-    confirmDiv.appendChild(message)
-
     let submitButton = document.createElement("input")
     submitButton.type = "submit"
+    submitButton.innerText = "Submit Order"
     confirmDiv.appendChild(submitButton)
 
 })
