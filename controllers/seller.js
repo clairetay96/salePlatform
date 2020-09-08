@@ -44,9 +44,9 @@ module.exports = (allModels) => {
                     console.log(err.message)
                     response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(res.rows.length==0){
-                    response.render('catalogueForm', {sellerID, loggedIn: true, addDel: canAddAndDel})
+                    response.render('catalogueform', {sellerID, loggedIn: true, addDel: canAddAndDel})
                 } else {
-                    response.render('catalogueForm', {sellerID, sellerItems: res.rows, loggedIn: true, addDel: canAddAndDel})
+                    response.render('catalogueform', {sellerID, sellerItems: res.rows, loggedIn: true, addDel: canAddAndDel})
                 }
             })
         } else {
