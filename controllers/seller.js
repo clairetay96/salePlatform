@@ -6,6 +6,8 @@ module.exports = (allModels) => {
 
     const db_seller = allModels.seller
 
+    let loggedIn = request => sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']
+
     let sellerLoggedIn = (request) =>{
         return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="sellers"
     }
@@ -16,7 +18,7 @@ module.exports = (allModels) => {
             db_seller.getSellerItems(sellerID, null, (err, res, placeholder)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (res.rows.length==0){
                     response.render("sellerCatalogue", {sellerID, loggedIn: true})
                 } else {
@@ -40,7 +42,7 @@ module.exports = (allModels) => {
             db_seller.getSellerItems(sellerID, address, (err, res, canAddAndDel)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(res.rows.length==0){
                     response.render('catalogueForm', {sellerID, loggedIn: true, addDel: canAddAndDel})
                 } else {
@@ -48,7 +50,7 @@ module.exports = (allModels) => {
                 }
             })
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -75,13 +77,13 @@ module.exports = (allModels) => {
             db_seller.postCatalogueForm(sellerID, allNewInput, allEditInput,(err, success)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (success) {
-                    response.send("Database update successful.")
+                    response.render('message', {loggedIn: true, message: 'Database update successful.'})
                 }
             })
         } else {
-            response.send("You do not have permission to add to catalogue.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -92,7 +94,7 @@ module.exports = (allModels) => {
             db_seller.deleteCatalogueItems(sellerID, (err, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else {
                     response.redirect("/")
                 }
@@ -110,14 +112,15 @@ module.exports = (allModels) => {
             db_seller.getSellerItems(request.cookies['userID'], null, (err, res, placeholder)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else {
                     res.loggedIn = true
+                    res.seller_id = request.cookies['userID']
                     response.render('saleform', res)
                 }
             })
         } else {
-            response.send("you do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -147,15 +150,15 @@ module.exports = (allModels) => {
             db_seller.makeNewSales(sellerID, sale_name, sale_desc, datesLive, inputRows, (err, isValid, success)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(!isValid){
-                    response.send("You tried to add an item that's not yours.")
+                    response.render('message', {loggedIn: true, message: "You tried to add an item that's not yours."})
                 } else if(success){
-                    response.send("Sale added successfully.")
+                    response.render('message', {loggedIn: true, message: 'Sale added successfully.'})
                 }
             })
         } else {
-            response.send("You do not have permission for this.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -167,7 +170,7 @@ module.exports = (allModels) => {
             db_seller.renderEditSaleForm(sellerID, saleID, (err, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else {
                     let sellerInfo = {
                         seller_username,
@@ -183,7 +186,7 @@ module.exports = (allModels) => {
 
 
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
     }
@@ -206,15 +209,15 @@ module.exports = (allModels) => {
             db_seller.updateSaleInfo(inputRows, x.sale_id, x.seller_id, saleInfo, (err, cannotUpdate,res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 }else if(cannotUpdate) {
-                    response.send("You cannot update a sale once it has gone live.")
+                    response.render('message', {loggedIn: true, message: 'You cannot update a sale once it has gone live.'})
                 } else {
                     response.redirect("/")
                 }
             })
         } else {
-            response.send("You do not have permission to perform this action.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -226,9 +229,9 @@ module.exports = (allModels) => {
             db_seller.deleteSale(sellerID,saleID, (err, cannotDelete, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 }else if(cannotDelete){
-                    response.send("You can only delete a sale that hasn't occurred yet. If the sale has gone live, you can close it.")
+                    response.render('message', {loggedIn: true, message: 'You cannot delete a sale once it has gone live. You can close the sale instead.'})
                 } else {
                     response.redirect("/")
                 }
@@ -238,7 +241,7 @@ module.exports = (allModels) => {
 
 
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
     }
 
@@ -252,7 +255,7 @@ module.exports = (allModels) => {
             })
 
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
     }
@@ -264,9 +267,9 @@ module.exports = (allModels) => {
             db_seller.getSaleOrderInfo(sellerID, saleID, (err, isValid, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occured.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (!isValid) {
-                    response.send("You do not have permission to view this page.")
+                    response.render('message', {loggedIn: true, message: 'You do not have permission to view this page.'})
                 } else if(res) {
                     res.loggedIn = true
                     response.render('saleOrderPage', res)
@@ -275,7 +278,7 @@ module.exports = (allModels) => {
             })
 
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
     }

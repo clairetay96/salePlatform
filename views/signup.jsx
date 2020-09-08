@@ -13,21 +13,32 @@ class SignUp extends React.Component {
 
         return (
             <html>
-                <Head />
+                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
+                <div className="container">
+                    <div class="form-title">
+                    <h1>Create an account</h1>
+                    </div>
+                    <div className="additional-deets">
                     <form method="POST" action="/user/new/">
-                        New Username: <input type="text" name="username"/> <br/><br/>
+                        <label>New Username</label>
+                        <input type="text" name="username" autocomplete="off" required/>
                         {message}
-                        New Password: <input type="password" name="password"/> <br/><br/>
-                        Role: <select name="role">
+                        <label>New Password</label><input type="password" name="password" required/>
+                        <label>Role</label>
+                        <select name="role">
                             <option disabled selected value>  --Select an option--  </option>
                             <option value="buyers">Buyer</option>
                             <option value="sellers">Seller</option>
-                            </select><br/><br/>
-                        Details: <textarea name="details" /><br/><br/>
+                            </select>
+                        <label>Additional Details</label><textarea name="details" />
+                        <div class="submit-button">
                         <input type="submit"/>
+                        </div>
                     </form>
+                    </div>
+                </div>
                 </body>
             </html>)
     }

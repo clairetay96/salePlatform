@@ -8,6 +8,10 @@ module.exports = (allModels) => {
     const db_seller = allModels.seller
     const db_buyer = allModels.buyer
 
+    let loggedIn = (request) => {
+        return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']
+    }
+
     let buyerLoggedIn = (request) =>{
         return (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="buyers")
     }
@@ -34,17 +38,21 @@ module.exports = (allModels) => {
             db_buyer.purchaseMaker(queries, sellerID, saleID, request.cookies['userID'], (err,orderID, soldOut)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (orderID&&soldOut.length==0) {
-                    response.send("Order successful. Your order id is "+ orderID +". <a href='/'>Back to homepage.</a>")
+                    response.render('message', {loggedIn: true, message: "Order successful. Your order id is "+ orderID })
                 } else if (orderID&&soldOut.length > 0){
-                    response.send(soldOut[0])
+                    let notice = "Order partially successful. Your order ID is "+ orderID + "."
+                    soldOut.forEach((item)=>{
+                        notice += "\n" + item
+                    })
+                    response.render('message', {loggedIn: true, message: notice })
                 } else if (!orderID){
-                    response.send("No successful purchases."+soldOut[0])
+                    response.render('message', {loggedIn: true, message: "Sorry! Everything you wanted is sold out." })
                 }
             })
         } else {
-            response.send("You need to be logged in as a buyer to make a purchase.")
+            response.render('message', {loggedIn:loggedIn(request), message: "You need to be logged in as a buyer to make a purchase." })
         }
     }
 
@@ -56,15 +64,15 @@ module.exports = (allModels) => {
             db_buyer.trackSaleQuery(buyerID, saleID, sellerUsername, (err, saleExists, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(!saleExists){
-                    response.send("The sale you are trying to track does not exist.")
+                    response.render('message', {loggedIn: true, message: 'The sale you are trying to track does not exist.'})
                 } else {
                     response.redirect('back')
                 }
             })
         } else {
-            response.send("You need to be logged in as a buyer to track a sale.")
+            response.render('message', {loggedIn: loggedIn(request), message: "You need to be logged in as a buyer to track a sale." })
         }
     }
 
@@ -76,16 +84,16 @@ module.exports = (allModels) => {
             db_buyer.removeTrackSale(buyerID, saleID, sellerUsername, (err, saleExists, res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(!saleExists){
-                    response.send("The sale you are trying to untrack does not exist. It might have been deleted by the seller.")
+                    response.render('message', {loggedIn: true, message: 'The sale you are trying to untrack does not exist.'})
                 } else {
                     response.redirect('back')
                 }
             })
 
         } else {
-            response.send("You do not have permission to perform this action.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission t0 perform this action.'})
         }
 
 
@@ -98,15 +106,15 @@ module.exports = (allModels) => {
             db_buyer.trackSellerQuery(buyerID, sellerUsername, (err, userExists,res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(!userExists){
-                    response.send("The user you are trying to track does not exist.")
+                    response.render('message', {loggedIn: true, message: 'The seller you are trying to track does not exist.'})
                 } else {
                     response.redirect('back')
                 }
             })
         } else {
-            response.send("You need to be logged in as a buyer to track a sale.")
+            response.render('message', {loggedIn: loggedIn(request), message: "You need to be logged in as a buyer to track a sale." })
         }
     }
 
@@ -117,15 +125,15 @@ module.exports = (allModels) => {
             db_buyer.removeTrackSeller(buyerID, sellerUsername, (err, userExists,res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if(!userExists){
-                    response.send("The user you are trying to track does not exist.")
+                    response.render('message', {loggedIn: true, message: 'The seller you are trying to untrack does not exist.'})
                 } else {
                     response.redirect('back')
                 }
             })
         } else {
-            response.send("You do not have permission to perform this action.")
+            response.render('message', {loggedIn: loggedIn(request), message: "You do not have permission to perform this action." })
         }
 
     }
@@ -138,15 +146,15 @@ module.exports = (allModels) => {
             db_seller.getSaleInfo(saleID, seller_username, buyerID, (err, saleInfo, saleItems)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
-                    response.send("This sale does not exist - did you get the username/sale ID right?")
+                    response.render('message', {loggedIn: true, message: 'This sale does not exist. Did you get the username/id right?'})
                 }else {
                     response.render("saleLivePage", {sale: saleInfo, items: saleItems, seller_username, loggedIn: true})
                 }
             })
         } else {
-            response.send("This page is available for buyers only.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'This page is available for buyers only.'})
         }
 
     }
@@ -158,9 +166,9 @@ module.exports = (allModels) => {
             db_buyer.getOrderInfo(orderID, buyerID, (err, isValid,res)=>{
                 if(err){
                     console.log(err.message)
-                    response.send("Error occurred.")
+                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
                 } else if (!isValid) {
-                    response.send("You do not have permission to view this page.")
+                    response.render('message', {loggedIn: true, message: 'You do not have permission to view this page.'})
                 } else {
                     res.loggedIn = true
                     console.log(res)
@@ -171,7 +179,7 @@ module.exports = (allModels) => {
         })
 
         } else {
-            response.send("You do not have permission to view this page.")
+            response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
 

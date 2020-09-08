@@ -10,7 +10,9 @@ class SellerPage extends React.Component {
         let allItems = this.props.catalogue.rows
         let allSales = this.props.sales.rows
         let seller_username = this.props.seller_username
+        console.log(seller_username)
         let isFollowing = this.props.isFollowing
+        console.log(isFollowing)
         let loggedIn = this.props.loggedIn
 
         let date_slicer = (date) =>{

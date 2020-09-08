@@ -6,12 +6,16 @@ import NavBar from './components/navBar.jsx'
 class SaleForm extends React.Component {
     render() {
         let allItems = this.props.rows
-        let sellerID = this.props.rows[0].seller_id
+        let sellerID = this.props.seller_id
         let loggedIn = this.props.loggedIn
 
-        let allItemsHTML = allItems.map((item)=>{
+        let allItemsHTML;
+
+        allItemsHTML = allItems.map((item)=>{
             let qtyAvName = "qtyAv" + item.item_id
             let maxOrdName = "maxOrd" + item.item_id
+
+
             return (<tr className="saleItem">
                         <td>{item.item_name}</td>
                         <td>{item.price}</td>
@@ -19,6 +23,11 @@ class SaleForm extends React.Component {
                         <td><input type="number" name={maxOrdName} min="0" defaultValue="0"/></td>
                     </tr>)
         })
+
+        if(allItems.length==0){
+            allItemsHTML = <tr><td col-span="4">You have no items available. Edit your catalogue <a href='/seller/catalogue/edit/new'>here.</a></td></tr>
+
+        }
 
         let allItemsTable = (<table>
             <tr>

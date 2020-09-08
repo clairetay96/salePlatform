@@ -25,7 +25,7 @@ module.exports = (allModels) => {
                 db_seller.sellerInfoFromID(request.cookies['userID'], (err, sellerInfo, placeholder)=>{
                     if(err){
                         console.log(err.message)
-                        response.send("Error occurred.")
+                        response.render('message', {loggedIn: true, message: 'Error occured.'})
                     } else {
                         sellerInfo.loggedIn = true
                         response.render('sellerhp', sellerInfo)
@@ -36,7 +36,7 @@ module.exports = (allModels) => {
                 db_buyer.buyerInfoFromID(request.cookies['userID'], (err, userInfo)=>{
                     if(err){
                         console.log(err.message)
-                        response.send("Error occurred.")
+                        response.render('message', {loggedIn: true, message: 'Error occured.'})
                     } else {
                         userInfo.loggedIn = true
                         response.render('buyerhp', userInfo)
@@ -54,11 +54,11 @@ module.exports = (allModels) => {
         db_neutral.logInVerify(values, (err, res, usernameExists, logInSuccess)=>{
             if(err){
                 console.log(err.message)
-                response.send("Error occurred.")
+                response.render('message', {loggedIn: false, message: 'Error occured.'})
             } else if (!usernameExists) {
                 response.send("Username does not exist. Create an account <a href='/user/new'>here</a>.")
             } else if(!logInSuccess){
-                response.send("Incorrect password.")
+                response.render('message', {loggedIn: false, message: 'Incorrect password.'})
             } else if(logInSuccess) {
                 response.cookie('userID', res.rows[0]['user_id'])
                 response.cookie('role', res.rows[0].role)
@@ -75,7 +75,7 @@ module.exports = (allModels) => {
         if(!loggedIn(request)) {
             response.render('signup')
         } else {
-            response.send("You are logged in. Log out to create a new account.")
+            response.render('message', {loggedIn: false, message: 'Error occured.'})
         }
 
     }
@@ -86,11 +86,11 @@ module.exports = (allModels) => {
         db_neutral.newUser(values, (err, res, usernameExists)=>{
             if(err){
                 console.log(err.message)
-                response.send("Error occurred.")
+                response.render('message', {loggedIn: true, message: 'Error occurred.'})
             } else if (usernameExists) {
                 response.render('signup', {usernameTaken: true})
             } else {
-                response.send('Sign up successful - <a href="/">log in at the homepage</a>.')
+                response.render('message', {loggedIn: false, message: 'Sign up successful. Log in at the homepage.'})
             }
         })
 
@@ -102,9 +102,9 @@ module.exports = (allModels) => {
         db_seller.getSaleInfo(saleID, seller_username, isBuyer(request), (err, saleInfo, saleItems, isFollowing)=>{
             if(err){
                 console.log(err.message)
-                response.send("Error occurred.")
+                response.render('message', {loggedIn: true, message: 'Error occurred.'})
             } else if (saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.send("This sale does not exist - did you get the username/sale ID right?")
+                response.render('message', {loggedIn: false, message: 'Sign up successful. Log in at the homepage.'})
             }else {
                 response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: true})
             }
@@ -116,7 +116,7 @@ module.exports = (allModels) => {
         db_seller.sellerInfo(seller_username, isBuyer(request), (err, sellerInfo, isFollowing)=>{
             if(err){
                 console.log(err.message)
-                response.send("Error occured.")
+                response.render('message', {loggedIn: true, message: 'Error occurred.'})
             } else {
                 sellerInfo.isFollowing = isFollowing
                 sellerInfo.seller_username = seller_username
