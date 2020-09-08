@@ -26,7 +26,7 @@ class AllSellers extends React.Component {
 
 
                 let saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/"
-                if(Date.parse(time_live) < now){
+                if(Date.parse(time_live+"+08:00") < now){
                     saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/live"
                     timeLive = "LIVE"
                 }

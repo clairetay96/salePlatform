@@ -57,7 +57,7 @@ class SellerPage extends React.Component {
         let pastSalesHTML = allSales.map((item)=>{
             let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
             let liveLink = saleLink+"live"
-            if(now > Date.parse(item.time_live)) {
+            if(now > Date.parse(item.time_live+"+08:00")) {
                 let state;
                 if(item.sold_out){
                     state=<div className="closed">CLOSED</div>

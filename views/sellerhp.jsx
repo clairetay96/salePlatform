@@ -38,7 +38,7 @@ class SellerHomepage extends React.Component {
         let pastsales = []
         let now = new Date()
         sales.forEach((item)=>{
-            if(Date.parse(item.time_live)>=now){
+            if(Date.parse(item.time_live+"+08:00")>=now){
                 upcomingsales.push(item)
             } else {
                 pastsales.push(item)

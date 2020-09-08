@@ -33,7 +33,7 @@ class Homepage extends React.Component {
 
         let trackedSaleData = buyersSalesTr.map((item)=>{
             let now = new Date()
-            let dropDate = Date.parse(item.time_live)
+            let dropDate = Date.parse(item.time_live+"+08:00")
             let countdownHTML = <div className="countdown text-center"><span className="timer"></span><span className="livetime" style={hiddenStyle}>{item.time_live}</span></div>
 
             let toSaleButton;

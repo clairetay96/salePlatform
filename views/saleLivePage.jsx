@@ -40,7 +40,7 @@ class SaleLivePage extends React.Component {
             {allItemsHTML}
             </table>)
 
-        if(now >= Date.parse(saleInfo.time_live)&&!closedState){
+        if(now >= Date.parse(saleInfo.time_live+"+08:00")&&!closedState){
             return (
                 <html>
                     <Head additionalStyle={{otherScripts: ["/saleRooms.css"]}}/>
