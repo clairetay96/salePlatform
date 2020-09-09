@@ -16,9 +16,8 @@ module.exports = (app, allModels) => {
     //create a new account
     app.post("/user/new/", noUserControllerFunc.postSignUp)
 
-    app.get("/user/edit")
-    app.put("/user/edit")
-    app.delete("/user/delete/")
+    app.get("/user/edit", noUserControllerFunc.renderEditUserForm)
+    app.put("/user/edit", noUserControllerFunc.editUserPut)
 
     app.get("/seller", noUserControllerFunc.getAllSellers)
     app.get("/sales", noUserControllerFunc.getAllSales)

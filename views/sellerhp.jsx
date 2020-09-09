@@ -46,11 +46,16 @@ class SellerHomepage extends React.Component {
         })
 
         let pastSalesHTML = pastsales.map((item)=>{
+            let closed=<div style={{'color':'red'}} className="text-center">LIVE</div>
+            if(item.sold_out){
+                closed=<div className="text-center">CLOSED</div>
+            }
             return (<tr className="table-row-link">
                 <td>{item.sale_name}</td>
                 <td className="sale-ID">{item.sale_id}</td>
                 <td>{date_slicer(item.time_live)}</td>
-                <td>{item.order_count}</td>
+                <td className="text-center">{item.order_count}</td>
+                <td>{closed}</td>
                 </tr>)
         })
 
@@ -61,6 +66,7 @@ class SellerHomepage extends React.Component {
                 <th>ID</th>
                 <th>Drop Time</th>
                 <th>Orders</th>
+                <th className="text-center">Status</th>
                 {pastSalesHTML}
             </tr>
             </table>

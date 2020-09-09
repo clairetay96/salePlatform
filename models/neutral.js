@@ -76,9 +76,49 @@ module.exports = (dbPool) =>{
     }
 
 
+    let getUserInfo = (userID, queryTable, callback) =>{
+        let role = queryTable.slice(0, queryTable.length-1) + "_id"
+        let queryText = "SELECT * FROM "+queryTable+" WHERE "+role+"=$1"
+        dbPool.query(queryText,[userID])
+            .then(res=> {callback(null, res)})
+            .catch(err=>{callback(err,null)})
+    }
+
+    let putUserInfo = (userID, queryTable, newInfo, oldPassword, passwordChange, callback)=>{
+        let role = queryTable.slice(0, queryTable.length-1) + "_id"
+        let queryText = "SELECT * FROM "+queryTable+" WHERE "+role+"=$1 AND password=$2"
+        dbPool.query(queryText, [userID, oldPassword])
+            .then(res => {
+                if (res.rowCount == 0) {
+                    callback(null, false, null)
+                } else {
+                    if(passwordChange) {
+                        let queryText1 = "UPDATE "+queryTable+" SET password=$1, details=$2 WHERE "+role+"=$3"
+                        dbPool.query(queryText1, newInfo)
+                            .then(res=>{callback(null, true, res)})
+                            .catch(err=>{callback(err, true, null)})
+
+                    } else {
+                        let queryText1 = "UPDATE "+queryTable+" SET details=$1 WHERE "+role+"=$2"
+                        dbPool.query(queryText1, newInfo)
+                            .then(res=>{callback(null, true, res)})
+                            .catch(err=>{callback(err, true, null)})
+                    }
+
+                }
+            })
+            .catch(err=>{callback(err,null,null)})
+
+
+
+    }
+
+
     return {
         newUser,
         logInVerify,
-        getAllSales
+        getAllSales,
+        getUserInfo,
+        putUserInfo
     }
 }

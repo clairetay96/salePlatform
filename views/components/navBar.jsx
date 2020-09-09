@@ -4,8 +4,10 @@ import LogOutButton from './logout.jsx'
 class NavBar extends React.Component {
     render () {
         let LogButton = (<a href="/"><button id="log-button">Log in</button></a>)
+        let editAcc;
         if(this.props.loggedIn==true){
             LogButton = <LogOutButton />
+            editAcc = <div className="edit-acc"><a href="/user/edit">Manage Account</a></div>
 
         }
         let browse = <div className="browse"><a href="/seller">Sellers</a><a href="/sales">Sales</a></div>
@@ -14,6 +16,7 @@ class NavBar extends React.Component {
             <div id="nav-bar">
                 <div id="nav-logo"><a href="/"><img src="/hayaku_logo_white.png"/></a></div>
                 {browse}
+                {editAcc}
                 <div id="log-button-div">{LogButton}</div>
             </div>
         )

@@ -6,10 +6,12 @@ class SaleOrderPage extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let allRows = this.props.rows
+        let saleInfo = this.props.saleRowFromSales
         let saleID = allRows[0] ? allRows[0].sale_id : this.props.sale_id
-        let closedState =allRows[0] ? allRows[0].sold_out : null
+        let closedState =allRows[0] ? allRows[0].sold_out : saleInfo.sold_out
         let username = this.props.seller_username
         let closeSaleURL = "/seller/"+username+"/sales/"+saleID+"/close"
+        let salePageURL = "/seller/"+username+"/sales/"+saleID+"/"
 
         let orderDataHTML = allRows.map((item)=>{
             return (<tr>
@@ -70,7 +72,10 @@ class SaleOrderPage extends React.Component {
                 <NavBar loggedIn={loggedIn}/>
                 <div className="container">
                 <div style={stylingHeader}>
-                <h1>Orders for Sale {saleID}</h1>
+                <div>
+                    <h1>Orders for Sale {saleID}</h1>
+                    <p><a href={salePageURL}>Go to sale page</a></p>
+                </div>
                 {closeSale}
                 </div>
 

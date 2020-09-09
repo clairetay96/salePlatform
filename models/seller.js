@@ -129,6 +129,7 @@ module.exports = (dbPool) =>{
 
     let sellerInfoFromID = (seller_id, callback) =>{
         let returnedValues = []
+        //catalogue, sales and all relevant info, follower count, sellers
         let tables = ['catalogue', '(SELECT bar.sale_id, bar.seller_id, time_live, sale_name, tracker_count, count AS order_count, sold_out FROM (SELECT sales.sale_id, seller_id, time_live, sale_name, count AS tracker_count, sold_out FROM sales LEFT JOIN (SELECT sale_id, COUNT(buyer_id) FROM sale_tracker GROUP BY sale_id) AS foo ON sales.sale_id=foo.sale_id) AS bar LEFT JOIN (SELECT sale_id, COUNT(order_id) FROM orders GROUP BY sale_id) AS orderfoo ON orderfoo.sale_id=bar.sale_id) AS fubar', 'seller_tracker', 'sellers']
 
         tables.forEach((table, index)=>{
@@ -360,16 +361,18 @@ module.exports = (dbPool) =>{
 
                     let queryText1 = "SELECT order_id, foobar.sale_id, buyer_id, timestamp, username, item_id, quantity, amt_charged, item_name, sold_out FROM (SELECT order_id, sale_id, buyer_id, timestamp, username, bar.item_id, quantity, amt_charged, item_name FROM (SELECT foo.order_id, sale_id,buyer_id, timestamp, username, item_id, quantity, amt_charged FROM (SELECT order_id, sale_id, orders.buyer_id, timestamp, username FROM orders INNER JOIN buyers ON orders.buyer_id=buyers.buyer_id) AS foo INNER JOIN order_details ON foo.order_id=order_details.order_id) AS bar INNER JOIN catalogue ON bar.item_id=catalogue.item_id) AS foobar INNER JOIN sales ON sales.sale_id=foobar.sale_id  WHERE sales.sale_id=$1 ORDER BY order_id ASC"
                     allQueries.push(dbPool.query(queryText1, [saleID])
-                        .then((res)=>res)
+                        .then((res1)=>res1)
                         .catch((err)=>{callback(err, null, null)}))
 
                     let queryText2 = "SELECT username FROM sellers WHERE seller_id=$1"
                     allQueries.push(dbPool.query(queryText2, [sellerID])
-                        .then((res)=>res)
+                        .then((res2)=>res2)
                         .catch((err)=>{callback(err,null,null)}))
 
                     Promise.all(allQueries)
-                        .then((res)=>{callback(null,true,res)})
+                        .then((res3)=>{
+                            res3[0].saleRowFromSales = res.rows[0]
+                            callback(null,true,res3)})
                         .catch((err)=>{callback(err, null,null)})
                 }
             })

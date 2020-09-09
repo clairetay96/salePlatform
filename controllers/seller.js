@@ -279,7 +279,6 @@ module.exports = (allModels) => {
                 } else if (!isValid) {
                     response.render('message', {loggedIn: true, message: 'You do not have permission to view this page.'})
                 } else if(res) {
-                    console.log(res)
                     let saleInfo = res[0]
                     saleInfo.loggedIn = true
                     saleInfo.sale_id = request.params.saleid

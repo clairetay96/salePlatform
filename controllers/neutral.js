@@ -104,7 +104,7 @@ module.exports = (allModels) => {
                 console.log(err.message)
                 response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
             } else if (!saleItems||saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.render('message', {loggedIn: false, message: 'This sale has been closed.'})
+                response.render('message', {loggedIn: loggedIn(request), message: 'This sale has been closed.'})
             }else {
                 response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: loggedIn(request)})
             }
@@ -152,12 +152,75 @@ module.exports = (allModels) => {
         })
     }
 
+    let renderEditUserForm = (request, response) => {
+        if(loggedIn(request)) {
+            let userID = request.cookies['userID']
+            let queryTable = request.cookies['role']
+            //query db for this user's info to populate form fields
+            db_neutral.getUserInfo(userID, queryTable, (err, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.render('message', {message: "Error occurred.", loggedIn: true})
+                } else {
+                    response.render('editUser', res)
+                }
+            })
+        } else {
+            response.render('message', "You do not have permission to perform this action.")
+        }
+
+    }
+
+    let editUserPut = (request, response) => {
+        if(loggedIn(request)) {
+            //query db to update the user's info based on user ID and role
+            let userID = request.cookies['userID']
+            let queryTable = request.cookies['role']
+            let x = request.body
+            let oldPassword = sha256(x.old_password)
+            let newInfo;
+            let passwordChange = false
+            if(x.new_password.length>0){
+                newInfo = [sha256(x.new_password), x.details, userID]
+                passwordChange = true
+            } else {
+                newInfo = [x.details, userID]
+            }
+            db_neutral.putUserInfo(userID, queryTable, newInfo, oldPassword, passwordChange,(err, isValid, res)=>{
+                if(err){
+                    console.log(err.message)
+                    response.render('message', "Error occurred.")
+                } else if (!isValid) {
+                    response.render('message', {message: "Wrong password.", loggedIn: true})
+                } else {
+                    response.redirect("/")
+                }
+            })
+
+        } else {
+            response.render('message', "You do not have permission to perform this action.")
+        }
+
+    }
+
     let logout = (request, response) =>{
         response.clearCookie('userID')
         response.clearCookie('role')
         response.clearCookie('sessionCookie')
         response.redirect("/")
     }
+
+
+
+    let deleteUser = (request, response) =>{
+        if(loggedIn(request)) {
+
+        } else {
+            response.render('message', "You do not have permission to perform this action.")
+        }
+    }
+
+
 
     return {
         loggedIn,
@@ -170,7 +233,9 @@ module.exports = (allModels) => {
         saleWaitingRoom,
         sellerPage,
         getAllSellers,
-        getAllSales
+        getAllSales,
+        renderEditUserForm,
+        editUserPut
     }
 
 }
