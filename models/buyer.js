@@ -183,6 +183,7 @@ module.exports = (dbPool) =>{
 
     let buyerInfoFromID = (buyerID, callback)=> {
         let allQueries = []
+        //0. gets buyer info, 1. gets sale info, 2. gets seller tracking info, 3. gets orders info
         let tables = ['buyers', '(SELECT buyer_id, foo.sale_id, foo.seller_id, time_live, sale_name,username AS seller_username,sold_out FROM (SELECT buyer_id, sales.sale_id,seller_id,time_live,sale_name,sold_out FROM sale_tracker INNER JOIN sales ON sale_tracker.sale_id=sales.sale_id) AS foo INNER JOIN sellers on foo.seller_id=sellers.seller_id) AS bar', '(SELECT seller_track_id, buyer_id, seller_tracker.seller_id, username FROM seller_tracker INNER JOIN sellers ON seller_tracker.seller_id=sellers.seller_id) AS foo', '(SELECT order_id, foo.sale_id, foo.seller_id,buyer_id,timestamp,username,sale_name FROM (SELECT order_id,sale_id,orders.seller_id,buyer_id,timestamp,username FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id) as bar']
 
         tables.forEach((table, index)=>{
@@ -210,7 +211,9 @@ module.exports = (dbPool) =>{
             .catch((err)=>{callback(err,null)})
     }
 
+
     let getOrderInfo = (orderID, buyerID, callback)=>{
+        //get sale info from order and buyer id
         let queryText = "SELECT username, sale_name,timestamp,time_live,order_id, sales.sale_id FROM (SELECT username, sale_id,order_id,buyer_id,timestamp FROM orders INNER JOIN sellers ON orders.seller_id=sellers.seller_id) AS foo INNER JOIN sales ON sales.sale_id=foo.sale_id WHERE order_id=$1 AND buyer_id=$2"
         dbPool.query(queryText, [orderID, buyerID])
             .then((res)=>{
@@ -218,6 +221,7 @@ module.exports = (dbPool) =>{
                     callback(null, false, null)
                 } else {
                     let saleInfo = res.rows[0]
+                    //get all orders with the given order ID
                     let queryText1 = "SELECT item_name, quantity, amt_charged FROM order_details INNER JOIN catalogue ON order_details.item_id=catalogue.item_id WHERE order_id=$1"
                     dbPool.query(queryText1, [orderID])
                         .then((res1)=>{

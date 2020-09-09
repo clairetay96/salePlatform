@@ -1,15 +1,8 @@
 module.exports = (dbPool) =>{
 
-    let deleteCatalogueItems = (sellerID, callback)=>{
-        let queryText = "DELETE FROM catalogue WHERE seller_id=$1"
-        dbPool.query(queryText, [sellerID])
-            .then((res)=>{callback(null, res)})
-            .catch((err)=>{callback(err, null)})
-    }
-
+    //updates catalogue form
     let postCatalogueForm = (sellerID, newInputRows, editInputRows, callback) => {
         //should also check if item belongs to seller
-
         let allQueries = []
 
         let queryText = "INSERT INTO catalogue(item_name, price, product_desc,image_url,seller_id) VALUES($1,$2,$3,$4,$5)"
@@ -401,7 +394,6 @@ module.exports = (dbPool) =>{
     return {
         postCatalogueForm,
         getSellerItems,
-        deleteCatalogueItems,
         makeNewSales,
         sellerInfo,
         getSaleInfo,

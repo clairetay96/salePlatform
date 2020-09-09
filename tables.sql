@@ -37,6 +37,8 @@ CREATE TABLE IF NOT EXISTS seller_tracker (
 
 CREATE TABLE IF NOT EXISTS sales (
 	sale_id SERIAL PRIMARY KEY,
+	sale_name TEXT,
+	sale_desc TEXT,
 	seller_id INTEGER,
 	time_live INTEGER,
 	sold_out BOOLEAN);

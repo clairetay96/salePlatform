@@ -19,6 +19,7 @@ module.exports = (allModels) => {
         return null
     }
 
+    //homepage - renders different JSXs based on user role (seller, buyer, not logged in)
     let renderHome = (request, response) =>{
         if (loggedIn(request)) {
             if(request.cookies['role']=="sellers"){
@@ -48,6 +49,7 @@ module.exports = (allModels) => {
         }
     }
 
+    //log in - authenticate and set cookies
     let logIn = (request, response) =>{
         x = request.body
         values = [x.username, sha256(x.password)]
@@ -65,21 +67,19 @@ module.exports = (allModels) => {
                 response.cookie('sessionCookie', sha256(res.rows[0]['user_id']+SALT+res.rows[0].role))
                 response.redirect("/")
             }
-
         })
-
-
     }
 
+    //sign up form
     let renderSignUp = (request, response) => {
         if(!loggedIn(request)) {
             response.render('signup')
         } else {
-            response.render('message', {loggedIn: false, message: 'Error occured.'})
+            response.render('message', {loggedIn: true, message: 'You need to sign out before you make a new account.'})
         }
-
     }
 
+    //make a new account
     let postSignUp = (request, response) => {
         let x = request.body
         let values = [x.username, sha256(x.password), x.details, x.role]
@@ -96,9 +96,11 @@ module.exports = (allModels) => {
 
     }
 
+    //render sale waiting room
     let saleWaitingRoom = (request, response)=>{
         let saleID = request.params.id
         let seller_username = request.params.username
+        //saleInfo contains sale id,name,seller username, time live and sold out, sale Items contains the items on sale with item name, product desc, price, quantity and max order, isFollowing contains whether or not the user is tracking the sale
         db_seller.getSaleInfo(saleID, seller_username, isBuyer(request), (err, saleInfo, saleItems, isFollowing)=>{
             if(err){
                 console.log(err.message)
@@ -111,8 +113,10 @@ module.exports = (allModels) => {
         })
     }
 
+    //render individual sellerPage
     let sellerPage = (request, response)=>{
         let seller_username = request.params.username
+        //seller info contains sales and catalogues
         db_seller.sellerInfo(seller_username, isBuyer(request), (err, sellerInfo, isFollowing)=>{
             if(err){
                 console.log(err.message)
@@ -126,6 +130,7 @@ module.exports = (allModels) => {
         })
     }
 
+    //render browse sellers page
     let getAllSellers = (request, response) =>{
         db_seller.getAllSellers(isBuyer(request), (err, res)=>{
             if(err){
@@ -139,6 +144,7 @@ module.exports = (allModels) => {
 
     }
 
+    //render browse sales page
     let getAllSales = (request, response ) =>{
         db_neutral.getAllSales(isBuyer(request), (err, res)=>{
             if(err){
@@ -152,6 +158,7 @@ module.exports = (allModels) => {
         })
     }
 
+    //render edit user form
     let renderEditUserForm = (request, response) => {
         if(loggedIn(request)) {
             let userID = request.cookies['userID']
@@ -171,6 +178,7 @@ module.exports = (allModels) => {
 
     }
 
+    //post changes to user info
     let editUserPut = (request, response) => {
         if(loggedIn(request)) {
             //query db to update the user's info based on user ID and role

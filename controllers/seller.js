@@ -31,6 +31,7 @@ module.exports = (allModels) => {
         }
     }
 
+    //depending on whether it's /add, or /edit/all or edit/id, render a slightly different version of the catalogue update form
     let renderCatalogueForm = (request, response) =>{
         if (sellerLoggedIn(request)){
             let digits
@@ -54,7 +55,7 @@ module.exports = (allModels) => {
         }
     }
 
-
+    //post catalogue form - sorts items with existing item_id into inputs to be edited, else it's a new input
     let newCatalogueForm = (request, response) =>{
         let x = request.body
         let sellerID = x.seller_id
@@ -73,7 +74,6 @@ module.exports = (allModels) => {
                     }
                 }
             })
-            console.log(allNewInput, allEditInput)
             db_seller.postCatalogueForm(sellerID, allNewInput, allEditInput,(err, success)=>{
                 if(err){
                     console.log(err.message)
@@ -85,25 +85,6 @@ module.exports = (allModels) => {
         } else {
             response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
-    }
-
-    let deleteCatalogueForm = (request, response)=> {
-        let x = request.body
-        let sellerID = x.seller_id
-        if(sellerLoggedIn(request)&&request.cookies['userID']==sellerID){
-            db_seller.deleteCatalogueItems(sellerID, (err, res)=>{
-                if(err){
-                    console.log(err.message)
-                    response.render('message', {loggedIn: true, message: 'Error occurred.'})
-                } else {
-                    response.redirect("/")
-                }
-            })
-        }
-    }
-
-    let deleteItem = (request, response)=>{
-        let x = request.body
     }
 
     let renderSaleForm = (request, response)=>{
@@ -124,7 +105,7 @@ module.exports = (allModels) => {
         }
     }
 
-
+    //requires info from seller catalogue to render new sale form
     let newSaleForm = (request, response) =>{
         let x = request.body
         let sellerID = x.seller_id
@@ -162,6 +143,7 @@ module.exports = (allModels) => {
         }
     }
 
+    //requires information from db to render populated edit sale form
     let renderEditSaleForm = (request, response) =>{
         if(sellerLoggedIn(request)){
             let sellerID = request.cookies['userID']
@@ -181,20 +163,19 @@ module.exports = (allModels) => {
                     }
                     response.render('editSaleForm', sellerInfo)
                 }
-
             })
-
-
         } else {
             response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
     }
 
+    //posts update sale request
     let updateSale = (request, response)=>{
         let x = request.body
         if(sellerLoggedIn(request)&&x.seller_id==request.cookies['userID']){
             let inputRows = []
+            //first splits input fields into grouped queries
             Object.keys(x).forEach((item)=>{
                 if(item.includes("qtyAv")){
                     if(x[item]>0){
@@ -237,9 +218,6 @@ module.exports = (allModels) => {
                 }
             })
 
-
-
-
         } else {
             response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
@@ -249,7 +227,7 @@ module.exports = (allModels) => {
         if(sellerLoggedIn(request)){
             let sellerID = request.cookies['userID']
             let saleID = request.params.id
-            //must close sale and drop table, but will not remove orders from that sale.
+            //must close sale, making it impossible to make new orders, but will not remove orders from that sale.
             db_seller.closeSaleUpdate(sellerID, saleID, (err, isValid, res)=>{
                 if (err) {
                     console.log(err.message)
@@ -259,15 +237,14 @@ module.exports = (allModels) => {
                 } else {
                     response.render('message', {loggedIn: true, message: 'Sale successfully closed.'})
                 }
-
             })
-
         } else {
             response.render('message', {loggedIn: loggedIn(request), message: 'You do not have permission to view this page.'})
         }
 
     }
 
+    //get all orders from a sale
     let getSaleOrders = (request, response) =>{
         if(sellerLoggedIn){
             let sellerID = request.cookies['userID']
@@ -300,7 +277,6 @@ module.exports = (allModels) => {
         renderCatalogue,
         renderCatalogueForm,
         newCatalogueForm,
-        deleteCatalogueForm,
         renderSaleForm,
         newSaleForm,
         renderEditSaleForm,

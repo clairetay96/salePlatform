@@ -8,14 +8,17 @@ module.exports = (allModels) => {
     const db_seller = allModels.seller
     const db_buyer = allModels.buyer
 
+    //checks if a user is logged in & authenticates
     let loggedIn = (request) => {
         return sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']
     }
 
+    //checks if a buyer is logged in & authenticates
     let buyerLoggedIn = (request) =>{
         return (sha256(request.cookies['userID']+SALT+request.cookies['role'])==request.cookies['sessionCookie']&&request.cookies['role']=="buyers")
     }
 
+    //makes purchase (live sale page)
     let makePurchase = (request, response) =>{
         if (buyerLoggedIn(request)) {
 
@@ -23,10 +26,11 @@ module.exports = (allModels) => {
             let x = request.body
             let sellerID = x.seller_id
             let saleID = x.sale_id
-            let queries = []
+            let queries = [] //this will store all the queries we need to make to the database to update the quantity in the sales_* table
+
             Object.keys(x).forEach((item)=>{
-                if(item.includes("item")){
-                    let noKey = item.slice(4, item.length)
+                if(item.includes("item")){ //if request.body key contains 'item', it follows naming convention itemx where x is the item_id, and there is a corresponding field pricex
+                    let noKey = item.slice(4, item.length) //this retrieves the itemid
                     let values = [noKey, x[item], parseInt(x['price'+noKey])*x[item]] //contains item_id and quantity
                     if(x[item]>0){
                         queries.push(values)
@@ -34,6 +38,7 @@ module.exports = (allModels) => {
                 }
             })
 
+            //soldOut is an array that contains a list of items that were sold out. if orderID is null, no order was placed.
             db_buyer.purchaseMaker(queries, sellerID, saleID, request.cookies['userID'], (err,orderID, soldOut)=>{
                 if(err){
                     console.log(err.message)
@@ -54,6 +59,7 @@ module.exports = (allModels) => {
             response.render('message', {loggedIn:loggedIn(request), message: "You need to be logged in as a buyer to make a purchase." })
         }
     }
+
 
     let trackSale = (request, response) => {
         if (buyerLoggedIn(request)){
@@ -137,6 +143,7 @@ module.exports = (allModels) => {
 
     }
 
+    //renders saleLivePage - must GET all the sale info first
     let saleLivePage = (request, response) =>{
         if(buyerLoggedIn(request)){
             let saleID = request.params.id
@@ -155,9 +162,9 @@ module.exports = (allModels) => {
         } else {
             response.render('message', {loggedIn: loggedIn(request), message: 'This page is available for buyers only.'})
         }
-
     }
 
+    //get buyer order from order id
     let getOrder = (request, response) =>{
         if(buyerLoggedIn(request)){
             let orderID = request.params.orderid
