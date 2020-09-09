@@ -35,12 +35,13 @@
 
 .indiv-seller.larger {
 	width: 95%;
-	height: 70vh;
+	height: 50vh;
 	margin: 10px auto;
 	padding: 12px;
 	border: 1px solid rgba(50,152,255);
 	overflow: auto;
 }
+
 
 .item-cards {
 	width: 95%;
@@ -48,6 +49,10 @@
 	display: flex;
 	flex-wrap: nowrap;
 	overflow: auto;
+}
+
+.larger .item-cards {
+	height: 60%;
 }
 
 .image-cards {

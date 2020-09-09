@@ -30,6 +30,7 @@ class AllSales extends React.Component {
                     timeLive = "LIVE"
                     if(sold_out){
                         timeLive="CLOSED"
+                        saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/"
                     }
                 }
 
