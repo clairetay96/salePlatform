@@ -34,6 +34,8 @@ class SellerHomepage extends React.Component {
                 </div>)
         })
 
+        let catalogueItemsDiv = <div className="db-divbox"><input type="text" className="filter-search" placeholder="Search your items"/><div className="catalogue-items">{catalogueItemsHTML}</div></div>
+
         let upcomingsales = []
         let pastsales = []
         let now = new Date()
@@ -60,6 +62,8 @@ class SellerHomepage extends React.Component {
         })
 
         let pastSalesTable = (
+            <div className="db-table">
+            <input type="text" className="filter-table" placeholder="Search past sales"/>
             <table className="past-sales">
             <tr>
                 <th>Sale Name</th>
@@ -70,6 +74,7 @@ class SellerHomepage extends React.Component {
                 {pastSalesHTML}
             </tr>
             </table>
+            </div>
             )
 
         let upcomingSalesHTML = upcomingsales.map((item)=>{
@@ -82,7 +87,10 @@ class SellerHomepage extends React.Component {
                 </tr>)
         })
 
-        let upcomingSalesTable = (<table>
+        let upcomingSalesTable = (
+                    <div className="db-table">
+                    <input type="text" className="filter-table" placeholder="Search upcoming sales"/>
+                    <table>
                         <tr>
                             <th>Sale Name</th>
                             <th>ID</th>
@@ -92,7 +100,8 @@ class SellerHomepage extends React.Component {
                             <th></th>
                         </tr>
                         {upcomingSalesHTML}
-                        </table>)
+                        </table>
+                        </div>)
 
         return (
             <html>
@@ -135,9 +144,7 @@ class SellerHomepage extends React.Component {
                                 <h3>Catalogue</h3>
                                 <a href="/seller/catalogue/edit/">Edit your catalogue</a>
                             </div>
-                            <div className="catalogue-items">
-                                {catalogueItemsHTML}
-                            </div>
+                                {catalogueItemsDiv}
                         </div>
                     </div>
                 </div>

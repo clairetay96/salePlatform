@@ -9,7 +9,6 @@ class AllSellers extends React.Component {
         let loggedIn = this.props.loggedIn
         let sales = this.props.sales
 
-
         let salesHTML = sales.map((res)=>{
             let all_items = res.rows
             if(all_items.length>0){
@@ -18,8 +17,6 @@ class AllSellers extends React.Component {
                 let saleName = all_items[0].sale_name
                 let time_live = all_items[0].time_live
                 let now = new Date()
-
-
 
                 let sellerURL = "/seller/"+sellerName
                 let timeLive = "Live at "+time_live.slice(0,10) + " " + time_live.slice(11,16)
@@ -32,9 +29,9 @@ class AllSellers extends React.Component {
                 }
 
 
-                let followButton = <TrackSale seller_username={sellerName} saleID={saleID}/>
+                let followButton = <TrackSale seller_username={sellerName} sale_id={saleID}/>
                 if(all_items[0].buyer_id){
-                    followButton = <UntrackSale seller_username={sellerName} saleID={saleID}/>
+                    followButton = <UntrackSale seller_username={sellerName} sale_id={saleID}/>
                 }
 
                 let item_cards = []

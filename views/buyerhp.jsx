@@ -31,6 +31,12 @@ class Homepage extends React.Component {
                 </div>)
         })
 
+
+        let trackedSellerBox = <div className="db-divbox">
+                        <input type="text" className="filter-search" placeholder="Search tracked sellers"/>
+                        {trackedSellerHTML}
+                        </div>
+
         let trackedSaleData = buyersSalesTr.map((item)=>{
             let now = new Date()
             let dropDate = Date.parse(item.time_live+"+08:00")
@@ -67,6 +73,8 @@ class Homepage extends React.Component {
         })
 
         let trackedSaleHTML = (
+            <div className="db-table">
+            <input type="text" className="filter-table" placeholder="Search tracked sales"/>
             <table id="tracked-sales">
                 <tr>
                     <th>Seller</th>
@@ -76,7 +84,8 @@ class Homepage extends React.Component {
                     <th></th>
                 </tr>
                 {trackedSaleData}
-            </table>)
+            </table>
+            </div>)
 
 
 
@@ -93,6 +102,8 @@ class Homepage extends React.Component {
         })
 
         let ordersHTML = (
+            <div className="db-table">
+            <input type="text" className="filter-table" placeholder="Search orders"/>
             <table>
                 <tr>
                     <th>Sale</th>
@@ -100,7 +111,8 @@ class Homepage extends React.Component {
                     <th>Order ID</th>
                     <th>Order Date</th>
                 </tr>{ordersData}
-            </table>)
+            </table>
+            </div>)
 
         return (
             <html>
@@ -121,7 +133,7 @@ class Homepage extends React.Component {
                         <div className="col-md-5">
                             <div className="tracked-sellers">
                                 <h4>Tracked Sellers</h4>
-                                    {trackedSellerHTML}
+                                    {trackedSellerBox}
                             </div>
                             <div className="order-history">
                                 <h4>Transaction History</h4>

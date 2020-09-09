@@ -104,7 +104,7 @@ module.exports = (allModels) => {
                 console.log(err.message)
                 response.render('message', {loggedIn: loggedIn(request), message: 'Error occurred.'})
             } else if (!saleItems||saleInfo.rows.length==0||saleItems.rows.length==0){
-                response.render('message', {loggedIn: loggedIn(request), message: 'This sale has been closed.'})
+                response.render('message', {loggedIn: loggedIn(request), message: 'This sale has been closed, or there are no items attached to this sale.'})
             }else {
                 response.render("saleWaitRoom", {sale: saleInfo, items: saleItems, seller_username, isFollowing, loggedIn: loggedIn(request)})
             }

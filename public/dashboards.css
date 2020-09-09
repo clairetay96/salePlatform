@@ -149,3 +149,13 @@
 	text-align: center;
 	padding: 5px 10px;
 }
+
+.db-divbox input:not([type="submit"]) {
+	margin: 10px 5%;
+	width: 90%;
+}
+
+.db-table input:not([type="submit"]) {
+	margin: 10px 5%;
+	width: 90%;
+}

@@ -65,6 +65,12 @@ class SaleOrderPage extends React.Component {
 
         }
 
+        let stylingFooter = {
+            margin: '10px auto',
+            width: '90%',
+
+        }
+
         return (
             <html>
                 <Head />
@@ -80,7 +86,11 @@ class SaleOrderPage extends React.Component {
                 </div>
 
                     {orderDataTable}
+                    <div style={stylingFooter}>
+                <a href="/">Back to home</a>
                 </div>
+                </div>
+
 
                 </body>
             </html>

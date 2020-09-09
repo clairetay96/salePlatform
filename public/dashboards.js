@@ -67,3 +67,62 @@ trackedSales.forEach((element)=>{
 
     })
 })
+
+let dbTables=document.querySelectorAll(".db-table")
+
+dbTables.forEach((element)=>{
+    let searchBar = element.querySelector(".filter-table")
+    let table = element.querySelector("table")
+
+    searchBar.addEventListener("keyup", ()=>{
+        let query = event.target.value.toLowerCase()
+
+        let tableRows = table.querySelectorAll("tr")
+        tableRows.forEach((row, index)=>{
+            if(index!=0){
+                let eachCell = row.querySelectorAll("td")
+                let containsSearch = false
+                for(let i=0;i<eachCell.length;i++){
+                    if(eachCell[i].innerText.toLowerCase().includes(query)){
+                        containsSearch=true
+                        break
+                    }
+                }
+                if(containsSearch){
+                    row.style.display = ""
+                } else {
+                    row.style.display = "none"
+                }
+            }
+        })
+    })
+})
+
+
+let dbDivBoxes = document.querySelectorAll(".db-divbox")
+if(dbDivBoxes){
+    dbDivBoxes.forEach((element)=>{
+        let searchBar = element.querySelector(".filter-search")
+        let selectionArea = element
+        if(element.querySelector(".catalogue-items")){
+            selectionArea = element.querySelector(".catalogue-items")
+        }
+
+        searchBar.addEventListener("keyup", ()=>{
+            let query = event.target.value.toLowerCase()
+            let cards = selectionArea.querySelectorAll(":scope > div")
+
+            cards.forEach((card, index)=>{
+                let containsSearch=false
+                if(card.innerText.toLowerCase().includes(query)){
+                    containsSearch=true
+                }
+                if(containsSearch){
+                    card.style.display = ""
+                } else {
+                    card.style.display = "none"
+                }
+            })
+        })
+    })
+}
