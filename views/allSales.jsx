@@ -4,7 +4,7 @@ import NavBar from './components/navBar.jsx'
 import TrackSale from './components/trackSaleButton.jsx'
 import UntrackSale from './components/untrackSaleButton.jsx'
 
-class AllSellers extends React.Component {
+class AllSales extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let sales = this.props.sales
@@ -16,16 +16,21 @@ class AllSellers extends React.Component {
                 let saleID = all_items[0].sale_id
                 let saleName = all_items[0].sale_name
                 let time_live = all_items[0].time_live
+                let sold_out = all_items[0].sold_out
+                console.log(res)
                 let now = new Date()
 
                 let sellerURL = "/seller/"+sellerName
                 let timeLive = "Live at "+time_live.slice(0,10) + " " + time_live.slice(11,16)
-
-
                 let saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/"
+
+
                 if(Date.parse(time_live+"+08:00") < now){
                     saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/live"
                     timeLive = "LIVE"
+                    if(sold_out){
+                        timeLive="CLOSED"
+                    }
                 }
 
 
@@ -92,4 +97,4 @@ class AllSellers extends React.Component {
     }
 }
 
-module.exports = AllSellers
+module.exports = AllSales

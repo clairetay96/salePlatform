@@ -21,6 +21,10 @@ textarea {
 	height: 20vh;
 }
 
+textarea[name*="product_desc"] {
+	width: 120%;
+}
+
 .additional-deets {
 	width: 90%;
 	margin: 0 auto;

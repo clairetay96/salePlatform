@@ -11,7 +11,7 @@ class SellerCatalogue extends React.Component {
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
                 let editURL = "/seller/catalogue/edit/"+item.item_id
-                return (<tr><td>{item.item_name}</td> <td>{item.product_desc}</td> <td><a href={editURL}>Edit</a></td></tr>)
+                return (<tr><td>{item.item_name}</td> <td>{item.product_desc}</td> <td>{item.price}</td><td><a href={editURL}>Edit</a></td></tr>)
             })
 
             allItemsTable = (
@@ -19,6 +19,7 @@ class SellerCatalogue extends React.Component {
                     <tr>
                         <th>Item</th>
                         <th>Description</th>
+                        <th>Price($)</th>
                         <th></th>
                     </tr>
                     {allItemsHTML}

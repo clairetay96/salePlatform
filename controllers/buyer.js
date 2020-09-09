@@ -31,7 +31,6 @@ module.exports = (allModels) => {
                     if(x[item]>0){
                         queries.push(values)
                     }
-
                 }
             })
 

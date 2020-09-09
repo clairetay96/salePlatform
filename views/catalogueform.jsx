@@ -28,13 +28,13 @@ class CatalogueForm extends React.Component {
               <label>Item name</label> <input type="text" name={"item_name"+i} autoComplete="off" defaultValue={item.item_name}/>
               </div>
             <div className="field">
-              <label>Price</label> <input type="text" name={"price"+i} autoComplete="off" defaultValue={item.price}/>
-              </div>
-            <div className="field">
-              <label>Description</label> <input type="text" name={"product_desc"+i} autoComplete="off" defaultValue={item.product_desc}/>
+              <label>Price</label> <input type="number" step=".01" min="0" name={"price"+i} autoComplete="off" defaultValue={item.price}/>
               </div>
             <div className="field">
               <label>Image URL</label> <input type="text" name={"imgURL"+i} autoComplete="off" defaultValue={item.image_url}/>
+              </div>
+              <div className="field">
+              <label>Description</label> <textarea name={"product_desc"+i} autoComplete="off" defaultValue={item.product_desc}/>
               </div>
               {deleteButton}
               <input type="hidden" name={"item_id"+i} value={item.item_id}/>

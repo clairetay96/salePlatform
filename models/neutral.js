@@ -57,7 +57,7 @@ module.exports = (dbPool) =>{
                     res.rows.forEach((item)=>{
                         let saleID = item.sale_id
                         let table="sales_"+saleID
-                        let queryText1 = `SELECT bar.seller_id, sale_id, sale_name, sale_desc, item_name, quantity, price, time_live, image_url, username,item_id FROM (SELECT foo.sale_id, foo.seller_id,sale_name, sale_desc, time_live, foo.item_id, item_name, image_url, price,quantity FROM (SELECT sales.sale_id, sale_name, sale_desc, time_live, item_id, quantity,seller_id FROM sales INNER JOIN ${table} ON sales.sale_id=${table}.sale_id) AS foo INNER JOIN catalogue ON foo.item_id=catalogue.item_id) AS bar INNER JOIN sellers ON bar.seller_id=sellers.seller_id`
+                        let queryText1 = `SELECT bar.seller_id, sale_id, sale_name, sale_desc, item_name, quantity, price, time_live, image_url, username,item_id,sold_out FROM (SELECT foo.sale_id, foo.seller_id,sale_name, sale_desc, time_live, foo.item_id, item_name, image_url, price,quantity,sold_out FROM (SELECT sales.sale_id, sale_name, sale_desc, time_live, item_id, quantity,seller_id,sold_out FROM sales INNER JOIN ${table} ON sales.sale_id=${table}.sale_id) AS foo INNER JOIN catalogue ON foo.item_id=catalogue.item_id) AS bar INNER JOIN sellers ON bar.seller_id=sellers.seller_id`
                         allQueries.push(
                             dbPool.query(queryText1)
                                 .then(res=>res)
