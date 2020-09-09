@@ -1,5 +1,6 @@
 import React from 'react'
 
+//add track seller relation to seller_tracker table
 class TrackSeller extends React.Component {
     render() {
         let actionURL = "/seller/"+this.props.seller_username+"/track"

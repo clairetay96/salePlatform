@@ -6,8 +6,8 @@ import NavBar from './components/navBar.jsx'
 class CatalogueForm extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
-        let addDel = this.props.addDel
-        console.log(this.props)
+        let addDel = this.props.addDel //this property contains the information on whether an item can be added or deleted on the form. When editing a single existing item, item cannot be deleted or added. When editing entire catalogue, existing items cannot be deleted, but new items can be added and deleted.
+
 
         let deleteButton;
         let addButton;
@@ -21,6 +21,7 @@ class CatalogueForm extends React.Component {
 
         let allItemsHTML = <CatalogueItemInput />
 
+        //if sellerItems is defined, it means that this is a form that contains edit functionality - so must load item(s) that already exist in catalogue.
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
                 return (<div className="itemInput">

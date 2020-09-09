@@ -7,6 +7,7 @@ import UntrackSaleButton from './components/untrackSaleButton.jsx'
 
 class SaleWaitRoom extends React.Component {
     render() {
+
         let allItems = this.props.items.rows
         let saleInfo = this.props.sale.rows[0]
         let closedState = saleInfo.sold_out
@@ -19,22 +20,26 @@ class SaleWaitRoom extends React.Component {
 
         let sellerPageURL = "/seller/"+seller_username
 
+        //if user is following the sale, will be an untrack button.
         let followSaleButton = <TrackSaleButton seller_username={seller_username} sale_id={saleID}/>;
         if(isFollowing){
             followSaleButton = <UntrackSaleButton seller_username={seller_username} sale_id={saleID}/>
         }
 
+        //countdown feature, contains countdown and button to sale. Button only goes live at time.
         let counter_feature = (<div className="counter-feature">
-
                         <div className="countdown"></div>
                         <button id="liveSale">Click here to enter sale</button>
                         <p className="desc-font text-center">Button goes live at <span id="date-req" className="livetime">{saleInfo.time_live.slice(0, 10)+" "+saleInfo.time_live.slice(11, 16)}</span></p>
 
                         </div>)
+
+        //if the sale is closed, countdown feature is replaced with a notice that the sale is closed.
         if(closedState){
             counter_feature=<div className="closed">This sale is now closed.<div className="desc-font">Click <a href='/'>here</a> to go back to the homepage.</div></div>
         }
 
+        //make a div for each item that's in the sale, along with qty remaining and max order
         let allItemsHTML = allItems.map((item)=>{
             return (
                 <div className="row sale-item">

@@ -1,5 +1,6 @@
 import React from 'react'
 
+//delete seller tracker relation
 class UntrackSeller extends React.Component {
     render() {
         let actionURL = "/seller/"+this.props.seller_username+"/track?_method=DELETE"

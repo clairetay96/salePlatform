@@ -3,18 +3,18 @@ import CatalogueItemInput from './components/catalogueInput.jsx'
 import Head from './components/Head.jsx'
 import NavBar from './components/navBar.jsx'
 
+//to create a new sale
 class SaleForm extends React.Component {
     render() {
         let allItems = this.props.rows
         let sellerID = this.props.seller_id
         let loggedIn = this.props.loggedIn
 
-        let allItemsHTML;
 
-        allItemsHTML = allItems.map((item)=>{
+        //table row containing information for each item, as well as unique name for each field
+        let allItemsHTML = allItems.map((item)=>{
             let qtyAvName = "qtyAv" + item.item_id
             let maxOrdName = "maxOrd" + item.item_id
-
 
             return (<tr className="saleItem">
                         <td>{item.item_name}</td>

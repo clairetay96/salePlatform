@@ -6,23 +6,22 @@ class Homepage extends React.Component {
     render() {
         let buyerUsername = this.props.buyer.rows[0].username
         let buyersSalesTr = this.props['sales_tracked'].rows
+        let buyersSellersTr = this.props['sellers_tracked'].rows
+        let buyersOrders = this.props.orders.rows
+        let loggedIn = this.props.loggedIn
 
+        //sort the tracked sales by time_live
         buyersSalesTr.sort((a,b)=>{
             let date1 = Date.parse(a.time_live)
             let date2 = Date.parse(b.time_live)
             return date1-date2
         })
 
-
-        let buyersSellersTr = this.props['sellers_tracked'].rows
-        let buyersOrders = this.props.orders.rows
-        let loggedIn = this.props.loggedIn
-
-        let hiddenStyle= {display: 'none'}
-
+        //create divs that each contain a tracked seller and an untrack button
         let trackedSellerHTML = buyersSellersTr.map((item)=>{
             let untrackURL = "/seller/"+item.username+"/track?_method=DELETE"
             let sellerPage="/seller/"+item.username+"/"
+
             return (<div className="tracked-seller">
                     <div><a href={sellerPage}>{item.username}</a></div>
                     <form method="POST" action={untrackURL}>
@@ -31,17 +30,24 @@ class Homepage extends React.Component {
                 </div>)
         })
 
-
+        //put all the seller divs into a box with an input bar that will filter the items
         let trackedSellerBox = <div className="db-divbox">
                         <input type="text" className="filter-search" placeholder="Search tracked sellers"/>
                         {trackedSellerHTML}
                         </div>
 
+
+        //make table row for each tracked sale
         let trackedSaleData = buyersSalesTr.map((item)=>{
             let now = new Date()
             let dropDate = Date.parse(item.time_live+"+08:00")
+
+
+            //Rather than show the drop date and time, show a countdown. To implement countdown using front-end js, the drop date/time has to be on the page - so it's on the page, but hidden
+            let hiddenStyle= {display: 'none'} //inline styling because lazy
             let countdownHTML = <div className="countdown text-center"><span className="timer"></span><span className="livetime" style={hiddenStyle}>{item.time_live}</span></div>
 
+            //go to sale wait room if sale is not yet live, go directly to sale live page if sale is live, no link if sale has been closed.
             let toSaleButton;
 
             if(item.sold_out){
@@ -58,9 +64,9 @@ class Homepage extends React.Component {
 
             }
 
+            //relevant urls for each table row: able to untrack sale from dashboard
             let untrackURL = "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/track?_method=DELETE"
             let sellerURL = "/seller/"+item.seller_username+"/"
-             console.log(item)
 
             return (
                 <tr className="tracked-sale-row">
@@ -72,6 +78,7 @@ class Homepage extends React.Component {
                 </tr>)
         })
 
+        //wrap the tracked sales table in a div that has the filter table search functionality
         let trackedSaleHTML = (
             <div className="db-table">
             <input type="text" className="filter-table" placeholder="Search tracked sales"/>
@@ -88,7 +95,7 @@ class Homepage extends React.Component {
             </div>)
 
 
-
+        //create table rows for each order, with relevant links
         let ordersData = buyersOrders.map((item)=>{
             let orderURL = "/orders/"+item.order_id
             let sellerURL = "/seller/"+item.username
@@ -101,6 +108,7 @@ class Homepage extends React.Component {
                 </tr>)
         })
 
+        //wrap the order table in a div that has filter search table functionality
         let ordersHTML = (
             <div className="db-table">
             <input type="text" className="filter-table" placeholder="Search orders"/>

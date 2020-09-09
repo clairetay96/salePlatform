@@ -10,6 +10,7 @@ class SellerHomepage extends React.Component {
         let loggedIn = this.props.loggedIn
         let seller_username = this.props.username
 
+        //makes dates pretty
         let date_slicer = (date) =>{
             let year = date.slice(0,2)
             let month = date.slice(5,7)
@@ -19,6 +20,8 @@ class SellerHomepage extends React.Component {
             return day+"/"+month+"/"+year+" "+time
         }
 
+
+        //make a div for each item in the catalogue that contains item and image description
         let catalogueItemsHTML = catalogueItems.map((item)=>{
             let editURL = "/seller/catalogue/edit/"+item.item_id
             return (
@@ -34,8 +37,10 @@ class SellerHomepage extends React.Component {
                 </div>)
         })
 
+        //wrap all items into a div with filter search functionality
         let catalogueItemsDiv = <div className="db-divbox"><input type="text" className="filter-search" placeholder="Search your items"/><div className="catalogue-items">{catalogueItemsHTML}</div></div>
 
+        //sort sales into past and upcoming
         let upcomingsales = []
         let pastsales = []
         let now = new Date()
@@ -47,6 +52,7 @@ class SellerHomepage extends React.Component {
             }
         })
 
+        //make a table rows for past sales
         let pastSalesHTML = pastsales.map((item)=>{
             let closed=<div style={{'color':'red'}} className="text-center">LIVE</div>
             if(item.sold_out){
@@ -61,6 +67,7 @@ class SellerHomepage extends React.Component {
                 </tr>)
         })
 
+        //wrap table into a div with filter search functionality
         let pastSalesTable = (
             <div className="db-table">
             <input type="text" className="filter-table" placeholder="Search past sales"/>
@@ -77,6 +84,7 @@ class SellerHomepage extends React.Component {
             </div>
             )
 
+        //make table row for upcoming sales, option to edit sales
         let upcomingSalesHTML = upcomingsales.map((item)=>{
             return (<tr>
                 <td><a href={`/seller/${seller_username}/sales/${item.sale_id}/`}>{item.sale_name}</a></td>
@@ -87,6 +95,7 @@ class SellerHomepage extends React.Component {
                 </tr>)
         })
 
+        //wrap table in div with filter search functionality
         let upcomingSalesTable = (
                     <div className="db-table">
                     <input type="text" className="filter-table" placeholder="Search upcoming sales"/>

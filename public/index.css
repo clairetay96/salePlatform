@@ -98,3 +98,14 @@ td {
 .edit-acc a:hover {
 	color: rgba(255,255,255,1);
 }
+
+@media (max-width: 576px) {
+	#nav-bar * {
+		font-size: 10px;
+	}
+
+	#nav-bar img {
+		height: 20px;
+	}
+
+}

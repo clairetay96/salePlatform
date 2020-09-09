@@ -15,6 +15,7 @@ class BuyerOrder extends React.Component {
 
         let sumTotal = 0
 
+        //generate table rows for each item in the order, and tally sum of purchase
         let ordersRows = purchase.map((order)=>{
             sumTotal += parseFloat(order.amt_charged)
             return (
@@ -26,6 +27,7 @@ class BuyerOrder extends React.Component {
                     )
 
         })
+
 
         let orderTable = (
             <table>
@@ -62,7 +64,7 @@ class BuyerOrder extends React.Component {
                                 </tr>
                                 <tr>
                                     <td>Sale:</td>
-                                    <td>{sale_name}</td>
+                                    <td><a href={"/seller/"+seller_username+"/sales/"+saleID+"/"}>{sale_name}</a></td>
                                 </tr>
                                 <tr>
                                     <td>Sale ID:</td>
@@ -86,6 +88,10 @@ class BuyerOrder extends React.Component {
                             <h3>Orders</h3>
                             {orderTable}
                         </div>
+                        <div>
+                        <a href="/">Back to Home</a>
+                        </div>
+
                     </div>
 
                 </body>

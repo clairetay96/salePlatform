@@ -1,5 +1,6 @@
 import React from 'react'
 
+//made this when I thought I could do front end react... turns out no
 class CatalogueItemInput extends React.Component {
     render() {
         return (

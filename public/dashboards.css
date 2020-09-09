@@ -159,3 +159,11 @@
 	margin: 10px 5%;
 	width: 90%;
 }
+
+
+@media (max-width: 576px) {
+	.welcome-header * {
+		font-size: 18px;
+	}
+
+}

@@ -2,12 +2,14 @@ import React from 'react'
 import Head from './components/Head.jsx'
 import NavBar from './components/navBar.jsx'
 
+//displays seller catalogue and links to edit to seller
 class SellerCatalogue extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
         let allItemsHTML = <div></div>
         let allItemsTable = <div></div>
 
+        //if there are items, make each one into a table row
         if(this.props.sellerItems){
             allItemsHTML = this.props.sellerItems.map((item,i)=>{
                 let editURL = "/seller/catalogue/edit/"+item.item_id

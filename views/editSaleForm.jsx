@@ -5,23 +5,27 @@ import NavBar from './components/navBar.jsx'
 
 class SaleForm extends React.Component {
     render() {
-        let sellerItems = this.props.sellerItems.rows
-        let saleInfo = this.props.saleInfo.rows[0]
+        let sellerItems = this.props.sellerItems.rows //an array of all the items the seller offers
+        let saleInfo = this.props.saleInfo.rows[0] //information about the sale ie sale_id, time_live, etc
         let sellerID = saleInfo.seller_id
-        let saleItems = this.props.saleItems.rows
+        let saleItems = this.props.saleItems.rows //an array of only the items in the sale
         let loggedIn = this.props.loggedIn
         let actionURL = `/seller/${this.props.seller_username}/sales/${saleInfo.sale_id}/edit?_method=PUT`
         let deleteURL = `/seller/${this.props.seller_username}/sales/${saleInfo.sale_id}/delete?_method=DELETE`
 
+        //get an array of only the item_id
         let saleItemsID = saleItems.map(item=>item.item_id)
 
+        //create table row for item
         let allItemsHTML = sellerItems.map((item)=>{
             let qtyAvName = "qtyAv" + item.item_id
             let maxOrdName = "maxOrd" + item.item_id
+
+            //default value if item does not exist in the sale
             let defaultQtyVal = 0
             let defaultMaxOrd = 0
-            console.log(sellerItems, saleItems, saleItemsID)
 
+            //if the item already exists in the sale, set the default value to the database value
             if(saleItemsID.includes(item.item_id)){
                 for(let i=0;i<saleItemsID.length;i++){
                     if(saleItems[i].item_id==item.item_id){
@@ -38,10 +42,6 @@ class SaleForm extends React.Component {
                         <td><input type="number" name={maxOrdName} min="0" defaultValue={defaultMaxOrd}/></td>
                     </tr>)
         })
-
-        let confirmClick = ()=>{
-            return confirm('Are you sure?')
-        }
 
         let deleteSale = <div className="submit-button delete"><form method="POST" action={deleteURL}><input type="submit" value="Delete Sale"/></form></div>
 

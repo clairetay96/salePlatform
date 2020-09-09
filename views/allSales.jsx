@@ -7,24 +7,29 @@ import UntrackSale from './components/untrackSaleButton.jsx'
 class AllSales extends React.Component {
     render() {
         let loggedIn = this.props.loggedIn
-        let sales = this.props.sales
+        let sales = this.props.sales //this is an array containing objects - each object represents a sale. The "rows" in each object refers to an array that has one item per element
 
+        //make a div for each sale
         let salesHTML = sales.map((res)=>{
             let all_items = res.rows
+
+            //only generate a sale card if there are items on sale
             if(all_items.length>0){
+
                 let sellerName = all_items[0].username
                 let saleID = all_items[0].sale_id
                 let saleName = all_items[0].sale_name
                 let time_live = all_items[0].time_live
                 let sold_out = all_items[0].sold_out
-                console.log(res)
+
                 let now = new Date()
 
+                //URLs for each sale - to seller and sale
                 let sellerURL = "/seller/"+sellerName
-                let timeLive = "Live at "+time_live.slice(0,10) + " " + time_live.slice(11,16)
                 let saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/"
+                let timeLive = "Live at "+time_live.slice(0,10) + " " + time_live.slice(11,16)
 
-
+                //tell the user if the sale is live or closed. If live, it links directly to the live page. If closed, links to the sale waiting room.
                 if(Date.parse(time_live+"+08:00") < now){
                     saleURL = "/seller/"+sellerName+"/sales/"+saleID+"/live"
                     timeLive = "LIVE"
@@ -36,12 +41,13 @@ class AllSales extends React.Component {
 
 
                 let followButton = <TrackSale seller_username={sellerName} sale_id={saleID}/>
+                //buyer_id is null if the logged in buyer does not track the sale, or undefined if a buyer is not logged in. Otherwise, it is equivalent to the buyer id of the buyer who is logged in
                 if(all_items[0].buyer_id){
                     followButton = <UntrackSale seller_username={sellerName} sale_id={saleID}/>
                 }
 
+                //for each sale, a maximum of 3 items will be displayed
                 let item_cards = []
-
                 for(let i=0;i<all_items.length;i++){
                     if(i==3){
                         break

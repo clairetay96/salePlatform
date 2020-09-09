@@ -15,6 +15,7 @@ class SellerPage extends React.Component {
 
         let now = new Date()
 
+        //make dates pretty
         let date_slicer = (date) =>{
             let year = date.slice(0,2)
             let month = date.slice(5,7)
@@ -29,6 +30,7 @@ class SellerPage extends React.Component {
             followButton = <UntrackSeller seller_username={seller_username} />
         }
 
+        //make div for each item that has item image, name, desc and price
         let allItemsHTML = allItems.map((item)=>{
             return (<div className="catalogue-card">
                     <img src={item.image_url}/>
@@ -37,6 +39,8 @@ class SellerPage extends React.Component {
                         <div className="catalogue-card-desc"><b>${item.price}</b></div>
                         </div>)
         })
+
+        //make table row for each upcoming sale
         let upcomingSalesHTML = allSales.map((item)=>{
             let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
             if(now <= Date.parse(item.time_live)) {
@@ -53,7 +57,7 @@ class SellerPage extends React.Component {
             {upcomingSalesHTML}
             </table>)
 
-
+        //make table row for each past sale, link to sale and status (live or closed)
         let pastSalesHTML = allSales.map((item)=>{
             let saleLink = "/seller/"+seller_username+"/sales/" + item.sale_id + "/"
             let liveLink = saleLink+"live"

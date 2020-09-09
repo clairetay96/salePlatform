@@ -1,5 +1,6 @@
 import React from 'react'
 
+//logout button - sends request to server
 class Logout extends React.Component {
     render() {
         return (
