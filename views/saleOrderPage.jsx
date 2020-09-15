@@ -82,7 +82,7 @@ class SaleOrderPage extends React.Component {
                 <div style={stylingHeader}>
                 <div>
                     <h1>Orders for Sale {saleID}</h1>
-                    <p><a href={salePageURL}>Go to sale page</a></p>
+                    <p><a href={salePageURL}>{saleInfo.sale_name}</a></p>
                 </div>
                 {closeSale}
                 </div>

@@ -45,7 +45,7 @@ class CatalogueForm extends React.Component {
         }
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div class="container">
@@ -67,7 +67,7 @@ class CatalogueForm extends React.Component {
                                 <input type="submit"/>
                             </div>
                         </form>
-                        <script src="/addItem.js"></script>
+                        <script src="/scripts/addItem.js"></script>
                     </div>
                 </body>
             </html>

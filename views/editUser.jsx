@@ -13,7 +13,7 @@ class EditUser extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                 <div className="container">
@@ -36,7 +36,7 @@ class EditUser extends React.Component {
                         </div>
                     </form>
                     </div>
-                    <script src="/editUser.js"></script>
+                    <script src="/scripts/editUser.js"></script>
                 </div>
                 </body>
             </html>)

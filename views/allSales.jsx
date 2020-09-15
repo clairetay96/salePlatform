@@ -9,6 +9,23 @@ class AllSales extends React.Component {
         let loggedIn = this.props.loggedIn
         let sales = this.props.sales //this is an array containing objects - each object represents a sale. The "rows" in each object refers to an array that has one item per element
 
+        //sort by whether or not it's closed, then sort by time_live, sooner closer to top
+        sales.sort((a,b)=>{
+            if(!a.rowCount || !b.rowCount ){
+                return
+            }
+            let aSoldOut = a.rows[0].sold_out
+            let bSoldOut = b.rows[0].sold_out
+            if(aSoldOut==bSoldOut){
+                let aTimeLive = Date.parse(a.rows[0].time_live)
+                let bTimeLive = Date.parse(b.rows[0].time_live)
+                return aTimeLive - bTimeLive
+            }
+            return aSoldOut - bSoldOut
+        })
+
+        console.log(sales[0])
+
         //make a div for each sale
         let salesHTML = sales.map((res)=>{
             let all_items = res.rows
@@ -86,7 +103,7 @@ class AllSales extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/browse.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/browse.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div className="container">

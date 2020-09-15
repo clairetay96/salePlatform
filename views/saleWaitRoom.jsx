@@ -65,7 +65,7 @@ class SaleWaitRoom extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/saleRooms.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/saleRooms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div className="container">
@@ -89,7 +89,7 @@ class SaleWaitRoom extends React.Component {
 
 
 
-                        <script src="/saleWaitRoom.js"></script>
+                        <script src="/scripts/saleWaitRoom.js"></script>
                     </div>
                 </body>
             </html>

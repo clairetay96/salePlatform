@@ -8,14 +8,13 @@ let username =  document.querySelector("#username")? document.querySelector("#us
 //generates a countdown for each tracked sale
 allDeadlines.forEach((element)=>{
     //gets the hidden date from each div
-    let countDownDate = Date.parse(element.querySelector(".livetime").innerText)
+    let countDownDate = Date.parse(element.querySelector(".livetime").innerText+"+08:00")
 
     //implement countdown
     var myFunc = setInterval(()=>{
 
         let now = new Date()
         let timeleft = countDownDate - now
-
 
         let days = Math.floor(timeleft / (1000 * 60 * 60 * 24));
         let hours = Math.floor((timeleft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));

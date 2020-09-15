@@ -84,7 +84,7 @@ class SellerPage extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/sellerPage.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/sellerPage.css"]}}/>
 
                 <body>
                     <NavBar loggedIn={loggedIn}/>

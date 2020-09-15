@@ -96,9 +96,16 @@
 }
 
 .confirm-order {
-	width: 50%;
+	width: 80%;
 	margin: 5px auto;
 	text-align: center;
+	position: relative;
+}
+
+.confirm-order a {
+	position: absolute;
+	top: 0;
+	left: 10px;
 }
 
 #confirm, #confirmOrder input[type="submit"] {

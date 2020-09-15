@@ -41,7 +41,7 @@ class SaleForm extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/forms.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/forms.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div className="container">
@@ -74,7 +74,7 @@ class SaleForm extends React.Component {
                                 </div>
                             </div>
                         </form>
-                        <script src="/newSale.js"></script>
+                        <script src="/scripts/newSale.js"></script>
                     </div>
                 </body>
             </html>

@@ -61,7 +61,6 @@ class Homepage extends React.Component {
             } else {
                 let waitRoomURL= "/seller/"+item.seller_username+"/sales/"+item.sale_id+"/"
                 toSaleButton = <a href={waitRoomURL}><button>To waiting room</button></a>
-
             }
 
             //relevant urls for each table row: able to untrack sale from dashboard
@@ -73,7 +72,7 @@ class Homepage extends React.Component {
                     <td><a href={sellerURL}>{item.seller_username}</a></td>
                      <td>{item.sale_name}</td>
                      <td>{countdownHTML}</td>
-                     <td>{toSaleButton}</td>
+                     <td className="text-center">{toSaleButton}</td>
                      <td className="align-to-right"><form method="POST" action={untrackURL}><input type="submit" value="x"/></form></td>
                 </tr>)
         })
@@ -100,10 +99,10 @@ class Homepage extends React.Component {
             let orderURL = "/orders/"+item.order_id
             let sellerURL = "/seller/"+item.username
             return (
-                <tr>
+                <tr className="table-row-link">
                     <td>{item.sale_name}</td>
                     <td><a href={sellerURL}>{item.username}</a></td>
-                    <td className="text-center"><a href={orderURL}>{item.order_id}</a></td>
+                    <td className="text-center order-ID"><a href={orderURL}>{item.order_id}</a></td>
                     <td>{item.timestamp.toString().slice(4,16)}</td>
                 </tr>)
         })
@@ -124,7 +123,7 @@ class Homepage extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/dashboards.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/dashboards.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                 <div className="container">
@@ -150,7 +149,7 @@ class Homepage extends React.Component {
                         </div>
                     </div>
                 </div>
-                    <script src="/dashboards.js"></script>
+                    <script src="/scripts/dashboards.js"></script>
                 </body>
             </html>)
     }

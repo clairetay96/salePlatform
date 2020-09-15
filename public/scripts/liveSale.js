@@ -54,7 +54,7 @@ confirmButton.addEventListener("click", ()=>{
 
     let submitButton = document.createElement("input")
     submitButton.type = "submit"
-    submitButton.innerText = "Submit Order"
+    submitButton.value = "Submit Order"
     confirmDiv.appendChild(submitButton)
 
 })

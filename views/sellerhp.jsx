@@ -114,7 +114,7 @@ class SellerHomepage extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/dashboards.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/dashboards.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                 <div class="container">
@@ -160,7 +160,7 @@ class SellerHomepage extends React.Component {
                 </div>
 
 
-                    <script src="/dashboards.js"></script>
+                    <script src="/scripts/dashboards.js"></script>
                 </body>
             </html>)
     }

@@ -6,7 +6,7 @@ class Homepage extends React.Component {
     render() {
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/homepage.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/homepage.css"]}}/>
                 <body>
                     <div className="row homepage ">
                         <div className="col-md-6 logo">

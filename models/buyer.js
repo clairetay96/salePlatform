@@ -18,7 +18,7 @@ module.exports = (dbPool) =>{
                             let queryText3 = `SELECT * FROM catalogue WHERE item_id=$1 AND seller_id=$2`
                             failedQueries.push(
                                 dbPool.query(queryText3, [query[0], sellerID])
-                                    .then(res3 => "Insufficient number of "+res3.rows[0].item_name+", purchase unsuccessful." )
+                                    .then(res3 => "Insufficient number of "+res3.rows[0].item_name+", so none were purchased." )
                                     .catch(err3 => err3)
                             )
                         } else {

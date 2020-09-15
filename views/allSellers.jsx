@@ -51,7 +51,7 @@ class AllSellers extends React.Component {
 
         return (
             <html>
-                <Head additionalStyle={{otherScripts: ["/browse.css"]}}/>
+                <Head additionalStyle={{otherScripts: ["/styles/browse.css"]}}/>
                 <body>
                 <NavBar loggedIn={loggedIn}/>
                     <div className="container">

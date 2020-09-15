@@ -13,6 +13,7 @@ class SaleLivePage extends React.Component {
         let loggedIn = this.props.loggedIn
         let saleID = saleInfo.sale_id
         let postURL = "/seller/"+this.props.seller_username+"/sales/"+saleID+"/live"
+        let waitRoomURL = "/seller/"+this.props.seller_username+"/sales/"+saleID+"/"
         let now = new Date()
 
         //table row for each item
@@ -24,7 +25,7 @@ class SaleLivePage extends React.Component {
                 let itemPrice = "price"+item.item_id
                 return (
                     <tr className="saleItem">
-                        <td><h6 className="itemName">{item.item_name}</h6><div className="subtitle-font">Qty remaining: <b>{item.quantity}</b></div></td>
+                        <td><h6 className="itemName">{item.item_name}</h6><div className="subtitle-font">Qty remaining: <b>{item.quantity}</b><br/>Max order: <b>{item.max_order}</b></div></td>
                         <td className="itemPrice">${item.price}</td>
                         <td>Qty: <input type="number" name={itemName} max={item.max_order} min="0" className="orderqty"/>
                         <input type="hidden" name={itemPrice} value={item.price}/></td>
@@ -50,7 +51,7 @@ class SaleLivePage extends React.Component {
         if(now >= Date.parse(saleInfo.time_live+"+08:00")&&!closedState){
             return (
                 <html>
-                    <Head additionalStyle={{otherScripts: ["/saleRooms.css"]}}/>
+                    <Head additionalStyle={{otherScripts: ["/styles/saleRooms.css"]}}/>
                     <body>
                     <NavBar loggedIn={loggedIn}/>
                         <div class="container">
@@ -60,6 +61,7 @@ class SaleLivePage extends React.Component {
                                 </div>
 
                                 <div className="confirm-order">
+                                <a href={waitRoomURL}>Back to wait room</a>
                                 <button type="button" id="confirm">Confirm order</button>
                                 <input type="hidden" name="seller_id" value={sellerID}/>
                                 <input type="hidden" name="sale_id" value={saleID}/>
@@ -67,7 +69,7 @@ class SaleLivePage extends React.Component {
 
                                 <div id="confirmOrder"></div>
                             </form>
-                            <script src="/liveSale.js"></script>
+                            <script src="/scripts/liveSale.js"></script>
                         </div>
                     </body>
                 </html>
